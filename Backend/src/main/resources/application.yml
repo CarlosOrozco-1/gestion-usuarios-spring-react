@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gestion-usuarios-backend
+
+  datasource:
+    url: jdbc:sqlite:gestion_usuarios.db
+    driver-class-name: org.sqlite.JDBC
+    username:
+    password:
+
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        connection:
+          init_sql: "PRAGMA foreign_keys = ON"
+    show-sql: false
+    open-in-view: false
+
+jwt:
+  secret: ${JWT_SECRET:TuClaveSecretaMuyLargaYSegura2024GestionDeUsuarios!}
+  issuer: GestionUsuariosAPI
+  expiration-hours: 8
+
+---
+spring:
+  config:
+    activate:
+      on-profile: postgres
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gestion_usuarios_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: false
+    open-in-view: false
