@@ -49,12 +49,12 @@ public class UserService {
             throw new DuplicateResourceException("User", "email", request.getEmail());
         }
 
-        Role role = roleRepository.findById(request.getRoleId())
-                .orElseThrow(() -> new ResourceNotFoundException("Role", request.getRoleId()));
-
         if (request.getPassword() == null || request.getPassword().isBlank()) {
             throw new BadRequestException("Password is required");
         }
+
+        Role role = roleRepository.findById(request.getRoleId())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", request.getRoleId()));
 
         User user = User.builder()
                 .idNumber(request.getIdNumber())
