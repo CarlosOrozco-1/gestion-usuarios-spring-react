@@ -8,10 +8,10 @@
 - Context API or Zustand (state management)
 - Tailwind CSS (styling)
 
-## Phase 1: Project Scaffolding
-- [ ] Initialize React + TypeScript + Vite project
-- [ ] Configure Tailwind CSS
-- [ ] Set up folder structure:
+## Phase 1: Project Scaffolding ✅
+- [x] Initialize React + TypeScript + Vite project
+- [x] Configure Tailwind CSS
+- [x] Set up folder structure:
   ```
   src/
     api/        (Axios instance, endpoints)
@@ -23,45 +23,56 @@
     types/      (TypeScript interfaces)
     utils/      (helpers)
   ```
-- [ ] Create Axios instance with base URL + interceptors (JWT token)
-- [ ] Set up React Router with route skeleton
+- [x] Create Axios instance with base URL + interceptors (JWT token)
+- [x] Set up React Router with route skeleton
 
-## Phase 2: Authentication Module
-- [ ] Login page (`/login`)
-- [ ] Auth context (user state, token storage in localStorage)
-- [ ] Private route wrapper (redirect if not authenticated)
-- [ ] Auto-redirect to login on 401
+## Phase 2: Authentication Module ✅
+- [x] Login page (`/login`)
+- [x] Auth context (user state, token storage in localStorage)
+- [x] Private route wrapper (redirect if not authenticated)
+- [x] Auto-redirect to login on 401
 
-## Phase 3: Layout & Navigation
-- [ ] Dashboard layout with sidebar
-- [ ] Navigation menu (Users, Roles, Permissions)
-- [ ] Header with user info + logout button
-- [ ] Responsive sidebar (collapsible)
+## Phase 3: Layout & Navigation ✅
+- [x] Dashboard layout with sidebar
+- [x] Navigation menu (Users, Clients, Credentials, Roles, Permissions)
+- [x] Header with user info + logout button
+- [x] Responsive sidebar (collapsible)
 
-## Phase 4: Users CRUD
-- [ ] User list page (`/users`) with table
-- [ ] Create user form (modal or page)
-- [ ] Edit user form
-- [ ] Soft delete (deactivate/reactivate toggle)
-- [ ] Search/filter by name, email, role
+## Phase 4: Users CRUD ✅
+- [x] User list page (`/users`) with table
+- [x] Create user form (modal)
+- [x] Edit user form
+- [x] Soft delete (deactivate/reactivate toggle)
+- [x] Search/filter by name, email, ID number
 
-## Phase 5: Roles CRUD
-- [ ] Role list page (`/roles`)
-- [ ] Create/edit role form
-- [ ] Assign permissions to role (multi-select UI)
+## Phase 5: Clients CRUD ✅
+- [x] Client list page (`/clients`) with table
+- [x] Create/edit client form (modal)
+- [x] Soft delete (deactivate/reactivate toggle)
+- [x] Search/filter by name, email, ID number
 
-## Phase 6: Permissions CRUD
-- [ ] Permission list page (`/permissions`)
-- [ ] Create/edit permission form
+## Phase 6: Credentials CRUD ✅
+- [x] Credential list page (`/credentials`) with table
+- [x] Create/edit credential form (modal, with client selector)
+- [x] Delete credential
 
-## Phase 7: Error Handling & UX
+## Phase 7: Roles CRUD ✅
+- [x] Role list page (`/roles`)
+- [x] Create/edit role form
+- [x] Assign permissions to role (multi-select UI)
+
+## Phase 8: Permissions CRUD ✅
+- [x] Permission list page (`/permissions`)
+- [x] Create/edit permission form
+
+## Phase 9: Error Handling & UX ⬜
+- [x] Toast/notification system (success, error, warning)
 - [ ] Global error boundary
-- [ ] Toast/notification system (success, error, warning)
-- [ ] Loading skeletons/spinners
-- [ ] Empty state components
-- [ ] Confirm dialogs for destructive actions
+- [ ] Loading skeletons/spinners (solo texto "Loading...")
+- [ ] Empty state components (placeholder simple)
+- [ ] Confirm dialogs for destructive actions (usa `window.confirm`)
 
-## Phase 8: Polish
+## Phase 10: Polish ⬜
 - [ ] Pagination on list pages
 - [ ] Sortable columns
 - [ ] Form validation feedback

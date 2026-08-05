@@ -14,7 +14,7 @@ Backend/build/reports/tests/test/index.html
 
 ## Ejecutar solo un test específico
 ```bash
-./gradlew test --tests "UserServiceTest"
+./gradlew test --tests "SystemUserServiceTest"
 ./gradlew test --tests "AuthServiceTest"
 ./gradlew test --tests "RoleServiceTest"
 ./gradlew test --tests "PermissionServiceTest"
@@ -25,12 +25,12 @@ Backend/build/reports/tests/test/index.html
 ./gradlew test --info
 ```
 
-## Tests unitarios disponibles (32 tests)
+## Tests unitarios disponibles (33 tests)
 
 | Servicio | Archivo | Tests |
 |---|---|---|
 | AuthService | `AuthServiceTest.java` | login exitoso, credenciales inválidas |
-| UserService | `UserServiceTest.java` | findAll, findById, create (éxito + 3 errores), update (éxito + not found), deactivate, reactivate |
+| SystemUserService | `SystemUserServiceTest.java` | findAll, findById, create (éxito + 3 errores), update (éxito + not found), deactivate, reactivate |
 | RoleService | `RoleServiceTest.java` | findAll, findById, create (éxito + duplicado), update, delete (éxito + not found), assignPermissions (éxito + permission faltante) |
 | PermissionService | `PermissionServiceTest.java` | findAll, findById, create (éxito + duplicado), update (éxito + not found), delete (éxito + not found) |
 

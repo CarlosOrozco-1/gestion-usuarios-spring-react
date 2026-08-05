@@ -4,9 +4,9 @@ import com.gestionusuarios.dto.request.LoginRequest;
 import com.gestionusuarios.dto.response.LoginResponse;
 import com.gestionusuarios.entity.Role;
 import com.gestionusuarios.entity.Status;
-import com.gestionusuarios.entity.User;
+import com.gestionusuarios.entity.SystemUser;
 import com.gestionusuarios.exception.UnauthorizedException;
-import com.gestionusuarios.repository.UserRepository;
+import com.gestionusuarios.repository.SystemUserRepository;
 import com.gestionusuarios.security.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,17 +33,17 @@ class AuthServiceTest {
 
     @Mock private AuthenticationManager authenticationManager;
     @Mock private JwtTokenProvider jwtTokenProvider;
-    @Mock private UserRepository userRepository;
+    @Mock private SystemUserRepository systemUserRepository;
     @InjectMocks private AuthService authService;
 
-    private User user;
+    private SystemUser user;
 
     @BeforeEach
     void setUp() {
         Role role = Role.builder().id(1).name("ADMIN").status(Status.ACTIVE).build();
-        user = User.builder()
+        user = SystemUser.builder()
                 .id(1).idNumber("123").name("Admin").email("admin@test.com")
-                .password("encoded").role(role).status(Status.ACTIVE).active(true)
+                .password("encoded").role(role).active(true)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -60,7 +60,7 @@ class AuthServiceTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
         when(auth.getPrincipal()).thenReturn(userDetails);
         when(jwtTokenProvider.generateToken(userDetails)).thenReturn("token123");
-        when(userRepository.findByEmailAndActiveTrue("admin@test.com")).thenReturn(Optional.of(user));
+        when(systemUserRepository.findByEmailAndActiveTrue("admin@test.com")).thenReturn(Optional.of(user));
 
         LoginResponse result = authService.login(req);
         assertEquals("token123", result.getToken());

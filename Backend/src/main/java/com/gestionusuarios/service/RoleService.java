@@ -1,7 +1,6 @@
 package com.gestionusuarios.service;
 
 import com.gestionusuarios.dto.request.RoleRequest;
-import com.gestionusuarios.dto.response.PermissionResponse;
 import com.gestionusuarios.dto.response.RoleResponse;
 import com.gestionusuarios.entity.Permission;
 import com.gestionusuarios.entity.PermissionRole;
@@ -10,8 +9,10 @@ import com.gestionusuarios.entity.Status;
 import com.gestionusuarios.exception.BadRequestException;
 import com.gestionusuarios.exception.DuplicateResourceException;
 import com.gestionusuarios.exception.ResourceNotFoundException;
+import com.gestionusuarios.mapper.RoleMapper;
 import com.gestionusuarios.repository.PermissionRepository;
 import com.gestionusuarios.repository.RoleRepository;
+import com.gestionusuarios.repository.SystemUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +26,12 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private final SystemUserRepository systemUserRepository;
 
     @Transactional(readOnly = true)
     public List<RoleResponse> findAll() {
         return roleRepository.findAll().stream()
-                .map(this::toResponse)
+                .map(RoleMapper::toResponse)
                 .toList();
     }
 
@@ -37,7 +39,7 @@ public class RoleService {
     public RoleResponse findById(Integer id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Role", id));
-        return toResponse(role);
+        return RoleMapper.toResponse(role);
     }
 
     public RoleResponse create(RoleRequest request) {
@@ -51,7 +53,7 @@ public class RoleService {
                 .status(Status.ACTIVE)
                 .build();
 
-        return toResponse(roleRepository.save(role));
+        return RoleMapper.toResponse(roleRepository.save(role));
     }
 
     public RoleResponse update(Integer id, RoleRequest request) {
@@ -66,13 +68,17 @@ public class RoleService {
         role.setName(request.getName());
         role.setDescription(request.getDescription());
 
-        return toResponse(roleRepository.save(role));
+        return RoleMapper.toResponse(roleRepository.save(role));
     }
 
     public void delete(Integer id) {
-        if (!roleRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Role", id);
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", id));
+
+        if (systemUserRepository.existsByRoleId(id)) {
+            throw new BadRequestException("Cannot delete role because it has assigned system users");
         }
+
         roleRepository.deleteById(id);
     }
 
@@ -94,27 +100,6 @@ public class RoleService {
             role.getRolePermissions().add(pr);
         }
 
-        return toResponse(roleRepository.save(role));
-    }
-
-    private RoleResponse toResponse(Role role) {
-        List<PermissionResponse> permissions = role.getRolePermissions().stream()
-                .map(pr -> PermissionResponse.builder()
-                        .id(pr.getPermission().getId())
-                        .name(pr.getPermission().getName())
-                        .description(pr.getPermission().getDescription())
-                        .resourcePath(pr.getPermission().getResourcePath())
-                        .createdAt(pr.getPermission().getCreatedAt())
-                        .build())
-                .toList();
-
-        return RoleResponse.builder()
-                .id(role.getId())
-                .name(role.getName())
-                .description(role.getDescription())
-                .status(role.getStatus().name())
-                .createdAt(role.getCreatedAt())
-                .permissions(permissions)
-                .build();
+        return RoleMapper.toResponse(roleRepository.save(role));
     }
 }

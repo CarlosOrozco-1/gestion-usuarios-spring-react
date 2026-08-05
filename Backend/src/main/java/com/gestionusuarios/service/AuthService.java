@@ -2,10 +2,10 @@ package com.gestionusuarios.service;
 
 import com.gestionusuarios.dto.request.LoginRequest;
 import com.gestionusuarios.dto.response.LoginResponse;
-import com.gestionusuarios.dto.response.UserResponse;
-import com.gestionusuarios.entity.User;
+import com.gestionusuarios.entity.SystemUser;
 import com.gestionusuarios.exception.UnauthorizedException;
-import com.gestionusuarios.repository.UserRepository;
+import com.gestionusuarios.mapper.UserMapper;
+import com.gestionusuarios.repository.SystemUserRepository;
 import com.gestionusuarios.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
+    private final SystemUserRepository systemUserRepository;
 
     @Value("${jwt.expiration-hours}")
     private long expirationHours;
@@ -42,27 +42,13 @@ public class AuthService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtTokenProvider.generateToken(userDetails);
 
-        User user = userRepository.findByEmailAndActiveTrue(request.getEmail())
+        SystemUser user = systemUserRepository.findByEmailAndActiveTrue(request.getEmail())
                 .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
         return LoginResponse.builder()
                 .token(token)
                 .expiresIn(expirationHours * 3600)
-                .user(toUserResponse(user))
-                .build();
-    }
-
-    private UserResponse toUserResponse(User user) {
-        return UserResponse.builder()
-                .id(user.getId())
-                .idNumber(user.getIdNumber())
-                .name(user.getName())
-                .email(user.getEmail())
-                .roleName(user.getRole().getName())
-                .status(user.getStatus().name())
-                .active(user.getActive())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
+                .user(UserMapper.toResponse(user))
                 .build();
     }
 }

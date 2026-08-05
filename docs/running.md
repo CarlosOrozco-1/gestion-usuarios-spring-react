@@ -16,7 +16,26 @@ Tomcat started on port 8080 (http)
 Started GestionUsuariosApplication in X seconds
 ```
 
-## 2. Probar con Postman
+## 2. Seed de datos (SQLite)
+
+La primera vez que arranca, Hibernate crea las tablas (`ddl-auto: update`) y
+`DataSeeder` inserta automáticamente:
+
+- 3 roles: `ADMIN`, `CONTADOR`, `ASISTENTE`
+- 8 permisos (ADMIN_USERS, ADMIN_ROLES, ADMIN_PERMISSIONS, ASSIGN_PERMISSIONS,
+  VIEW_CLIENTS, MANAGE_CLIENTS, VIEW_CREDENTIALS, MANAGE_CREDENTIALS)
+- Usuario administrador:
+  ```
+  email: admin@example.com
+  password: password123
+  ```
+
+El seeder solo crea lo que no exista, así que puedes correrlo las veces que quieras.
+
+> Si cambiaste el esquema (refactor), borra `Backend/gestion_usuarios.db` y reinicia
+> para regenerar las tablas limpias.
+
+## 3. Probar con Postman
 
 ### Importar la colección
 1. Abre Postman
@@ -25,50 +44,33 @@ Started GestionUsuariosApplication in X seconds
 
 ### Flujo de prueba recomendado
 
-**Paso 1: Seed de datos (SQLite)**
-La primera vez que arranca, Hibernate crea las tablas automáticamente (`ddl-auto: update`). Las tablas inician vacías.
-
-Necesitas insertar datos iniciales para poder probar. Puedes hacerlo mediante los endpoints:
-
-1. **Crear un rol** → `POST /api/roles`
-   ```json
-   { "name": "ADMIN", "description": "Administrator" }
-   ```
-
-2. **Crear permisos** → `POST /api/permissions`
-   ```json
-   { "name": "CREATE_USER", "description": "Can create users", "resourcePath": "/api/users" }
-   ```
-
-3. **Asignar permisos al rol** → `POST /api/roles/{id}/permissions`
-   ```json
-   [1]
-   ```
-
-4. **Crear un usuario** → `POST /api/users`
-   ```json
-   {
-     "idNumber": "1234567890",
-     "name": "Admin",
-     "email": "admin@example.com",
-     "password": "password123",
-     "roleId": 1
-   }
-   ```
-
-5. **Login** → `POST /api/auth/login`
-   ```json
-   { "email": "admin@example.com", "password": "password123" }
-   ```
-   El script de Postman auto-asigna el `token` para los siguientes requests.
+**Paso 1: Login** → `POST /api/auth/login`
+```json
+{ "email": "admin@example.com", "password": "password123" }
+```
+El script de Postman auto-asigna el `token` para los siguientes requests.
 
 **Paso 2: CRUD**
-Una vez autenticado, prueba los endpoints de Users, Roles y Permissions desde Postman.
+Una vez autenticado, prueba los endpoints:
 
-## 3. Cambiar a PostgreSQL
+| Recurso | Endpoints |
+|---|---|
+| System Users | `GET/POST /api/system-users`, `GET/PUT/DELETE /api/system-users/{id}`, `PATCH /api/system-users/{id}/reactivate` |
+| Clients | `GET/POST /api/clients`, `GET/PUT/DELETE /api/clients/{id}`, `PATCH /api/clients/{id}/reactivate` |
+| Credentials | `GET/POST /api/credentials`, `GET/PUT/DELETE /api/credentials/{id}`, `GET /api/credentials/client/{clientId}` |
+| Roles | `GET/POST /api/roles`, `GET/PUT/DELETE /api/roles/{id}`, `POST /api/roles/{id}/permissions` |
+| Permissions | `GET/POST /api/permissions`, `GET/PUT/DELETE /api/permissions/{id}` |
+
+Cada endpoint requiere el permiso correspondiente (ej: `ADMIN_USERS` para
+system users, `MANAGE_CLIENTS` para crear clientes).
+
+## 4. Swagger UI
+Abrir en el navegador: `http://localhost:8080/swagger-ui/index.html`
+
+## 5. Cambiar a PostgreSQL
 ```bash
 ./gradlew bootRun --args='--spring.profiles.active=postgres'
 ```
 
-## 4. Detener el servidor
+## 6. Detener el servidor
 Presiona `Ctrl+C` en la terminal donde corre el servidor.

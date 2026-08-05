@@ -28,19 +28,18 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private Status status = Status.ACTIVE;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    // Inverse ManyToOne: PermissionRole → Role
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PermissionRole> rolePermissions = new ArrayList<>();
 
-    // Inverse OneToMany: User → Role
     @OneToMany(mappedBy = "role")
     @Builder.Default
-    private List<User> users = new ArrayList<>();
+    private List<SystemUser> systemUsers = new ArrayList<>();
 }

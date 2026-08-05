@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Gestion de Usuarios API",
-    "description": "Collection for the user management system.\n\n## Environment Variables\n- `base_url`: `http://localhost:8080`\n- `token`: Auto-populated after login\n- `user_id`, `role_id`, `permission_id`: Set manually from responses",
+    "description": "Collection for the user management system.\n\n## Environment Variables\n- `base_url`: `http://localhost:8080`\n- `token`: Auto-populated after login\n- `user_id`, `client_id`, `credential_id`, `role_id`, `permission_id`: Set manually from responses",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -43,38 +43,38 @@
       ]
     },
     {
-      "name": "Users",
+      "name": "System Users",
       "item": [
         {
-          "name": "List all users",
+          "name": "List all system users",
           "request": {
             "method": "GET",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/api/users",
+              "raw": "{{base_url}}/api/system-users",
               "host": ["{{base_url}}"],
-              "path": ["api", "users"]
+              "path": ["api", "system-users"]
             }
           }
         },
         {
-          "name": "Get user by ID",
+          "name": "Get system user by ID",
           "request": {
             "method": "GET",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "raw": "{{base_url}}/api/system-users/{{user_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "users", "{{user_id}}"]
+              "path": ["api", "system-users", "{{user_id}}"]
             }
           }
         },
         {
-          "name": "Create user",
+          "name": "Create system user",
           "request": {
             "method": "POST",
             "header": [
@@ -83,17 +83,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"idNumber\": \"1234567890\",\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securepass123\",\n  \"roleId\": 1\n}"
+              "raw": "{\n  \"idNumber\": \"1234567890\",\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securepass123\",\n  \"roleId\": 2\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/users",
+              "raw": "{{base_url}}/api/system-users",
               "host": ["{{base_url}}"],
-              "path": ["api", "users"]
+              "path": ["api", "system-users"]
             }
           }
         },
         {
-          "name": "Update user",
+          "name": "Update system user",
           "request": {
             "method": "PUT",
             "header": [
@@ -102,40 +102,238 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"idNumber\": \"1234567890\",\n  \"name\": \"John Updated\",\n  \"email\": \"john.updated@example.com\",\n  \"roleId\": 1\n}"
+              "raw": "{\n  \"idNumber\": \"1234567890\",\n  \"name\": \"John Updated\",\n  \"email\": \"john.updated@example.com\",\n  \"roleId\": 2\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "raw": "{{base_url}}/api/system-users/{{user_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "users", "{{user_id}}"]
+              "path": ["api", "system-users", "{{user_id}}"]
             }
           }
         },
         {
-          "name": "Deactivate user (soft delete)",
+          "name": "Deactivate system user (soft delete)",
           "request": {
             "method": "DELETE",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "raw": "{{base_url}}/api/system-users/{{user_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "users", "{{user_id}}"]
+              "path": ["api", "system-users", "{{user_id}}"]
             }
           }
         },
         {
-          "name": "Reactivate user",
+          "name": "Reactivate system user",
           "request": {
             "method": "PATCH",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/api/users/{{user_id}}/reactivate",
+              "raw": "{{base_url}}/api/system-users/{{user_id}}/reactivate",
               "host": ["{{base_url}}"],
-              "path": ["api", "users", "{{user_id}}", "reactivate"]
+              "path": ["api", "system-users", "{{user_id}}", "reactivate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "List all clients",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients"]
+            }
+          }
+        },
+        {
+          "name": "Get client by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "{{client_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create client",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idNumber\": \"9876543210\",\n  \"name\": \"ACME Corp\",\n  \"email\": \"contacto@acme.com\",\n  \"phone\": \"555-0001\",\n  \"address\": \"Av. Principal 123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/clients",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients"]
+            }
+          }
+        },
+        {
+          "name": "Update client",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idNumber\": \"9876543210\",\n  \"name\": \"ACME Corp S.A.\",\n  \"email\": \"contacto@acme.com\",\n  \"phone\": \"555-0002\",\n  \"address\": \"Av. Principal 456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "{{client_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Deactivate client (soft delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "{{client_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Reactivate client",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{client_id}}/reactivate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "{{client_id}}", "reactivate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Credentials",
+      "item": [
+        {
+          "name": "List all credentials",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/credentials",
+              "host": ["{{base_url}}"],
+              "path": ["api", "credentials"]
+            }
+          }
+        },
+        {
+          "name": "Get credentials by client ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/credentials/client/{{client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "credentials", "client", "{{client_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get credential by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/credentials/{{credential_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "credentials", "{{credential_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create credential",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"systemName\": \"SAP\",\n  \"username\": \"acme_user\",\n  \"encryptedPassword\": \"secret123\",\n  \"url\": \"https://sap.example.com\",\n  \"notes\": \"Credencial principal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/credentials",
+              "host": ["{{base_url}}"],
+              "path": ["api", "credentials"]
+            }
+          }
+        },
+        {
+          "name": "Update credential",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"systemName\": \"SAP\",\n  \"username\": \"acme_user\",\n  \"encryptedPassword\": \"newsecret456\",\n  \"url\": \"https://sap.example.com\",\n  \"notes\": \"Actualizada\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/credentials/{{credential_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "credentials", "{{credential_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete credential",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/credentials/{{credential_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "credentials", "{{credential_id}}"]
             }
           }
         }
@@ -286,7 +484,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"CREATE_USER\",\n  \"description\": \"Can create users\",\n  \"resourcePath\": \"/api/users\"\n}"
+              "raw": "{\n  \"name\": \"ADMIN_USERS\",\n  \"description\": \"Manage system users\",\n  \"resourcePath\": \"/api/system-users\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/permissions",
@@ -305,7 +503,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"CREATE_USER_UPDATED\",\n  \"description\": \"Updated description\",\n  \"resourcePath\": \"/api/users\"\n}"
+              "raw": "{\n  \"name\": \"ADMIN_USERS_UPDATED\",\n  \"description\": \"Updated description\",\n  \"resourcePath\": \"/api/system-users\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/permissions/{{permission_id}}",
@@ -344,6 +542,16 @@
     },
     {
       "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "client_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "credential_id",
       "value": "",
       "type": "string"
     },

@@ -2,7 +2,7 @@ package com.gestionusuarios.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,18 +13,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRequest {
+
     @NotBlank
+    @Size(max = 50)
     private String idNumber;
 
     @NotBlank
+    @Size(max = 200)
     private String name;
 
     @NotBlank
     @Email
+    @Size(max = 100)
     private String email;
 
+    @Size(max = 100)
     private String password;
 
-    @NotNull
     private Integer roleId;
 }

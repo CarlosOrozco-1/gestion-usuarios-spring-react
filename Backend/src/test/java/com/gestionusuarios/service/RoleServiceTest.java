@@ -11,6 +11,7 @@ import com.gestionusuarios.exception.DuplicateResourceException;
 import com.gestionusuarios.exception.ResourceNotFoundException;
 import com.gestionusuarios.repository.PermissionRepository;
 import com.gestionusuarios.repository.RoleRepository;
+import com.gestionusuarios.repository.SystemUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +31,7 @@ class RoleServiceTest {
 
     @Mock private RoleRepository roleRepository;
     @Mock private PermissionRepository permissionRepository;
+    @Mock private SystemUserRepository systemUserRepository;
     @InjectMocks private RoleService roleService;
 
     private Role role;
@@ -102,15 +104,23 @@ class RoleServiceTest {
 
     @Test
     void delete_ShouldRemoveRole() {
-        when(roleRepository.existsById(1)).thenReturn(true);
+        when(roleRepository.findById(1)).thenReturn(Optional.of(role));
+        when(systemUserRepository.existsByRoleId(1)).thenReturn(false);
         roleService.delete(1);
         verify(roleRepository).deleteById(1);
     }
 
     @Test
     void delete_ShouldThrowWhenNotFound() {
-        when(roleRepository.existsById(99)).thenReturn(false);
+        when(roleRepository.findById(99)).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> roleService.delete(99));
+    }
+
+    @Test
+    void delete_ShouldThrowWhenRoleHasUsers() {
+        when(roleRepository.findById(1)).thenReturn(Optional.of(role));
+        when(systemUserRepository.existsByRoleId(1)).thenReturn(true);
+        assertThrows(BadRequestException.class, () -> roleService.delete(1));
     }
 
     @Test

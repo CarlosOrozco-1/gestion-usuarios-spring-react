@@ -1,46 +1,56 @@
 # Backend Development Phases
 
-## Phase 1: Project Setup ⬜
+> El modelo actual usa **SystemUser** (usuarios del sistema con credenciales de login),
+> **Client** (clientes gestionados) y **Credential** (credenciales de acceso de cada
+> cliente a sistemas externos). El `User` original quedó reemplazado por `SystemUser`.
+
+## Phase 1: Project Setup ✅
 - [x] Project scaffolding (Gradle + Spring Boot)
-- [x] Entities (User, Role, Permission, PermissionRole)
+- [x] Entities (SystemUser, Client, Credential, Role, Permission, PermissionRole)
 - [x] Repositories (Spring Data JPA)
 - [x] Database config (SQLite default, PostgreSQL profile)
 - [x] Error handling (GlobalExceptionHandler + custom exceptions)
-- [ ] **Fix config file names**: `SecurityConfi.java` → `SecurityConfig.java`, `swaggerConfig.java` → `SwaggerConfig.java`
+- [x] Config files renombrados (`SecurityConfig.java`, `SwaggerConfig.java`)
 
-## Phase 2: Security Layer ⬜
-- [ ] `JwtTokenProvider` — generate/validate JWT tokens
-- [ ] `JwtAuthenticationFilter` — extract token from header, validate, set SecurityContext
-- [ ] `UserDetailsServiceImpl` — load user by email from DB
-- [ ] `SecurityConfig` — configure HttpSecurity, CORS, CSRF, password encoder
-- [ ] `CorsConfig` — allowed origins configuration
+## Phase 2: Security Layer ✅
+- [x] `JwtTokenProvider` — generate/validate JWT tokens
+- [x] `JwtAuthenticationFilter` — extract token from header, validate, set SecurityContext
+- [x] `UserDetailsServiceImpl` — load user by email from DB
+- [x] `SecurityConfig` — configure HttpSecurity, CORS, CSRF, password encoder
+- [x] `CorsConfig` — allowed origins configuration
+- [x] Authorization por permiso vía `@PreAuthorize("hasAuthority('...')")`
 
-## Phase 3: DTOs ⬜
-- [ ] `LoginRequest` (email + password)
-- [ ] `LoginResponse` (token + user info)
-- [ ] `UserRequest` (create/update user DTO)
-- [ ] `UserResponse` (user response DTO)
-- [ ] `RoleRequest` / `RoleResponse`
-- [ ] `PermissionRequest` / `PermissionResponse`
+## Phase 3: DTOs ✅
+- [x] `LoginRequest` (email + password)
+- [x] `LoginResponse` (token + user info)
+- [x] `UserRequest` / `UserResponse` (system user)
+- [x] `ClientRequest` / `ClientResponse`
+- [x] `CredentialRequest` / `CredentialResponse`
+- [x] `RoleRequest` / `RoleResponse`
+- [x] `PermissionRequest` / `PermissionResponse`
 
-## Phase 4: Service Layer ⬜
-- [ ] `AuthService` — authenticate, generate token
-- [ ] `UserService` — CRUD + soft delete/reactivate + validations
-- [ ] `RoleService` — CRUD + assign permissions
-- [ ] `PermissionService` — CRUD
+## Phase 4: Service Layer ✅
+- [x] `AuthService` — authenticate, generate token
+- [x] `SystemUserService` — CRUD + soft delete/reactivate + validations
+- [x] `ClientService` — CRUD + soft delete/reactivate + validations
+- [x] `CredentialService` — CRUD + filtrar por cliente
+- [x] `RoleService` — CRUD + assign permissions
+- [x] `PermissionService` — CRUD
 
-## Phase 5: Controllers ⬜
-- [ ] `AuthController` — POST /api/auth/login
-- [ ] `UserController` — GET/POST/PUT/DELETE /api/users, PATCH reactivate
-- [ ] `PermissionController` — GET/POST/PUT/DELETE /api/permissions
-- [ ] Role endpoints (if needed)
+## Phase 5: Controllers ✅
+- [x] `AuthController` — POST /api/auth/login
+- [x] `SystemUserController` — GET/POST/PUT/DELETE /api/system-users, PATCH reactivate
+- [x] `ClientController` — GET/POST/PUT/DELETE /api/clients, PATCH reactivate
+- [x] `CredentialController` — GET/POST/PUT/DELETE /api/credentials, GET /client/{clientId}
+- [x] `RoleController` — CRUD + assign permissions
+- [x] `PermissionController` — CRUD
 
-## Phase 6: Validation & Swagger ⬜
-- [ ] Request DTO validation annotations (`@NotBlank`, `@Email`, etc.)
-- [ ] `SwaggerConfig` — OpenAPI info + security scheme
+## Phase 6: Validation & Swagger ✅
+- [x] Request DTO validation annotations (`@NotBlank`, `@Email`, etc.)
+- [x] `SwaggerConfig` — OpenAPI info + security scheme (JWT bearer)
 
-## Phase 7: Testing ⬜
-- [ ] Unit tests: Service layer (JUnit 5 + Mockito)
+## Phase 7: Testing ✅
+- [x] Unit tests: Service layer (JUnit 5 + Mockito) — 33 tests
 - [ ] Integration tests: Repository layer (@DataJpaTest)
 - [ ] Integration tests: Controller layer (@WebMvcTest + @MockBean)
 - [ ] Security tests: Authentication flow, token validation

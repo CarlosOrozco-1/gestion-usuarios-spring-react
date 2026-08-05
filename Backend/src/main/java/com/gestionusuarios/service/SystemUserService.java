@@ -3,13 +3,13 @@ package com.gestionusuarios.service;
 import com.gestionusuarios.dto.request.UserRequest;
 import com.gestionusuarios.dto.response.UserResponse;
 import com.gestionusuarios.entity.Role;
-import com.gestionusuarios.entity.Status;
-import com.gestionusuarios.entity.User;
+import com.gestionusuarios.entity.SystemUser;
 import com.gestionusuarios.exception.BadRequestException;
 import com.gestionusuarios.exception.DuplicateResourceException;
 import com.gestionusuarios.exception.ResourceNotFoundException;
+import com.gestionusuarios.mapper.UserMapper;
 import com.gestionusuarios.repository.RoleRepository;
-import com.gestionusuarios.repository.UserRepository;
+import com.gestionusuarios.repository.SystemUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,33 +20,32 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserService {
+public class SystemUserService {
 
-    private final UserRepository userRepository;
+    private final SystemUserRepository systemUserRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public List<UserResponse> findAll() {
-        return userRepository.findAll().stream()
-                .filter(User::getActive)
-                .map(this::toResponse)
+        return systemUserRepository.findAll().stream()
+                .map(UserMapper::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public UserResponse findById(Integer id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", id));
-        return toResponse(user);
+        SystemUser user = systemUserRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("SystemUser", id));
+        return UserMapper.toResponse(user);
     }
 
     public UserResponse create(UserRequest request) {
-        if (userRepository.existsByIdNumber(request.getIdNumber())) {
-            throw new DuplicateResourceException("User", "idNumber", request.getIdNumber());
+        if (systemUserRepository.existsByIdNumber(request.getIdNumber())) {
+            throw new DuplicateResourceException("SystemUser", "idNumber", request.getIdNumber());
         }
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("User", "email", request.getEmail());
+        if (systemUserRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException("SystemUser", "email", request.getEmail());
         }
 
         if (request.getPassword() == null || request.getPassword().isBlank()) {
@@ -56,30 +55,29 @@ public class UserService {
         Role role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Role", request.getRoleId()));
 
-        User user = User.builder()
+        SystemUser user = SystemUser.builder()
                 .idNumber(request.getIdNumber())
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(role)
-                .status(Status.ACTIVE)
                 .active(true)
                 .build();
 
-        return toResponse(userRepository.save(user));
+        return UserMapper.toResponse(systemUserRepository.save(user));
     }
 
     public UserResponse update(Integer id, UserRequest request) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+        SystemUser user = systemUserRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("SystemUser", id));
 
         if (!user.getIdNumber().equals(request.getIdNumber())
-                && userRepository.existsByIdNumber(request.getIdNumber())) {
-            throw new DuplicateResourceException("User", "idNumber", request.getIdNumber());
+                && systemUserRepository.existsByIdNumber(request.getIdNumber())) {
+            throw new DuplicateResourceException("SystemUser", "idNumber", request.getIdNumber());
         }
         if (!user.getEmail().equals(request.getEmail())
-                && userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("User", "email", request.getEmail());
+                && systemUserRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException("SystemUser", "email", request.getEmail());
         }
 
         Role role = roleRepository.findById(request.getRoleId())
@@ -94,34 +92,20 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
-        return toResponse(userRepository.save(user));
+        return UserMapper.toResponse(systemUserRepository.save(user));
     }
 
     public void deactivate(Integer id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+        SystemUser user = systemUserRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("SystemUser", id));
         user.setActive(false);
-        userRepository.save(user);
+        systemUserRepository.save(user);
     }
 
     public void reactivate(Integer id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+        SystemUser user = systemUserRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("SystemUser", id));
         user.setActive(true);
-        userRepository.save(user);
-    }
-
-    private UserResponse toResponse(User user) {
-        return UserResponse.builder()
-                .id(user.getId())
-                .idNumber(user.getIdNumber())
-                .name(user.getName())
-                .email(user.getEmail())
-                .roleName(user.getRole().getName())
-                .status(user.getStatus().name())
-                .active(user.getActive())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
-                .build();
+        systemUserRepository.save(user);
     }
 }
