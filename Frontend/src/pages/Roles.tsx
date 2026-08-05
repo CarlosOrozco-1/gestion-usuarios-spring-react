@@ -25,7 +25,7 @@ export function Roles() {
   useEffect(() => {
     Promise.all([rolesApi.findAll(), permissionsApi.findAll()])
       .then(([r, p]) => { setRoles(r); setAllPermissions(p) })
-      .catch((err) => toast.showToast(err?.response?.data?.message || 'Failed to load roles', 'error'))
+      .catch((err) => toast.showToast(err?.response?.data?.message || 'Error al cargar los roles', 'error'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -48,28 +48,28 @@ export function Roles() {
       if (editingRole) {
         const updated = await rolesApi.update(editingRole.id, form)
         setRoles((prev) => prev.map((r) => (r.id === editingRole.id ? updated : r)))
-        toast.showToast('Role updated successfully')
+        toast.showToast('Rol actualizado correctamente')
       } else {
         const created = await rolesApi.create(form)
         setRoles((prev) => [...prev, created])
-        toast.showToast('Role created successfully')
+        toast.showToast('Rol creado correctamente')
       }
       setFormModal(false)
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Operation failed', 'error')
+      toast.showToast(err?.response?.data?.message || 'La operación falló', 'error')
     } finally {
       setSubmitting(false)
     }
   }
 
   async function handleDelete(role: RoleResponse) {
-    if (!window.confirm(`Delete role "${role.name}"? This action cannot be undone.`)) return
+    if (!window.confirm(`¿Eliminar el rol "${role.name}"? Esta acción no se puede deshacer.`)) return
     try {
       await rolesApi.delete(role.id)
       setRoles((prev) => prev.filter((r) => r.id !== role.id))
-      toast.showToast('Role deleted successfully')
+      toast.showToast('Rol eliminado correctamente')
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Failed to delete role', 'error')
+      toast.showToast(err?.response?.data?.message || 'Error al eliminar el rol', 'error')
     }
   }
 
@@ -84,10 +84,10 @@ export function Roles() {
     try {
       const updated = await rolesApi.assignPermissions(permRole.id, selectedPerms)
       setRoles((prev) => prev.map((r) => (r.id === permRole.id ? updated : r)))
-      toast.showToast('Permissions assigned successfully')
+      toast.showToast('Permisos asignados correctamente')
       setPermModal(false)
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Failed to assign permissions', 'error')
+      toast.showToast(err?.response?.data?.message || 'Error al asignar los permisos', 'error')
     }
   }
 
@@ -97,7 +97,7 @@ export function Roles() {
     )
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Loading...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
 
   return (
     <div>
@@ -107,7 +107,7 @@ export function Roles() {
           onClick={openCreate}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
-          + Add Role
+          + Agregar rol
         </button>
       </div>
 
@@ -116,11 +116,11 @@ export function Roles() {
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
               <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Description</th>
-              <th className="px-4 py-3">Permissions</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Actions</th>
+              <th className="px-4 py-3">Nombre</th>
+              <th className="px-4 py-3">Descripción</th>
+              <th className="px-4 py-3">Permisos</th>
+              <th className="px-4 py-3">Estado</th>
+              <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -134,7 +134,7 @@ export function Roles() {
                     onClick={() => openPermModal(role)}
                     className="rounded bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200"
                   >
-                    {role.permissions.length} permission{role.permissions.length !== 1 ? 's' : ''}
+                    {role.permissions.length} permiso{role.permissions.length !== 1 ? 's' : ''}
                   </button>
                 </td>
                 <td className="px-4 py-3">
@@ -152,13 +152,13 @@ export function Roles() {
                       onClick={() => openEdit(role)}
                       className="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100"
                     >
-                      Edit
+                      Editar
                     </button>
                     <button
                       onClick={() => handleDelete(role)}
                       className="rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-100"
                     >
-                      Delete
+                      Eliminar
                     </button>
                   </div>
                 </td>
@@ -168,10 +168,10 @@ export function Roles() {
         </table>
       </div>
 
-      <Modal open={formModal} onClose={() => setFormModal(false)} title={editingRole ? 'Edit Role' : 'Create Role'}>
+      <Modal open={formModal} onClose={() => setFormModal(false)} title={editingRole ? 'Editar rol' : 'Crear rol'}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Nombre</label>
             <input
               required
               value={form.name}
@@ -180,7 +180,7 @@ export function Roles() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Descripción</label>
             <textarea
               rows={3}
               value={form.description ?? ''}
@@ -194,20 +194,20 @@ export function Roles() {
               onClick={() => setFormModal(false)}
               className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {submitting ? 'Saving...' : editingRole ? 'Update' : 'Create'}
+              {submitting ? 'Guardando...' : editingRole ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>
       </Modal>
 
-      <Modal open={permModal} onClose={() => setPermModal(false)} title={`Permissions for ${permRole?.name ?? ''}`}>
+      <Modal open={permModal} onClose={() => setPermModal(false)} title={`Permisos para ${permRole?.name ?? ''}`}>
         <div className="space-y-2">
           {allPermissions.map((perm) => (
             <label
@@ -227,7 +227,7 @@ export function Roles() {
             </label>
           ))}
           {allPermissions.length === 0 && (
-            <p className="text-center text-sm text-gray-400">No permissions available.</p>
+            <p className="text-center text-sm text-gray-400">No hay permisos disponibles.</p>
           )}
         </div>
         <div className="flex justify-end gap-3 pt-4">
@@ -235,13 +235,13 @@ export function Roles() {
             onClick={() => setPermModal(false)}
             className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
-            Cancel
+            Cancelar
           </button>
           <button
             onClick={handleAssignPerms}
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
           >
-            Save Permissions
+            Guardar permisos
           </button>
         </div>
       </Modal>

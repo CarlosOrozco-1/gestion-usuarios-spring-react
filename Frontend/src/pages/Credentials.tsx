@@ -28,7 +28,7 @@ export function Credentials() {
   useEffect(() => {
     Promise.all([credentialsApi.findAll(), clientsApi.findAll()])
       .then(([c, cl]) => { setCredentials(c); setClients(cl) })
-      .catch((err) => toast.showToast(err?.response?.data?.message || 'Failed to load credentials', 'error'))
+      .catch((err) => toast.showToast(err?.response?.data?.message || 'Error al cargar las credenciales', 'error'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -58,28 +58,28 @@ export function Credentials() {
       if (editingCred) {
         const updated = await credentialsApi.update(editingCred.id, form)
         setCredentials((prev) => prev.map((c) => (c.id === editingCred.id ? updated : c)))
-        toast.showToast('Credential updated successfully')
+        toast.showToast('Credencial actualizada correctamente')
       } else {
         const created = await credentialsApi.create(form)
         setCredentials((prev) => [...prev, created])
-        toast.showToast('Credential created successfully')
+        toast.showToast('Credencial creada correctamente')
       }
       setModalOpen(false)
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Operation failed', 'error')
+      toast.showToast(err?.response?.data?.message || 'La operación falló', 'error')
     } finally {
       setSubmitting(false)
     }
   }
 
   async function handleDelete(cred: CredentialResponse) {
-    if (!window.confirm(`Delete credential for "${cred.systemName}"? This action cannot be undone.`)) return
+    if (!window.confirm(`¿Eliminar la credencial de "${cred.systemName}"? Esta acción no se puede deshacer.`)) return
     try {
       await credentialsApi.delete(cred.id)
       setCredentials((prev) => prev.filter((c) => c.id !== cred.id))
-      toast.showToast('Credential deleted successfully')
+      toast.showToast('Credencial eliminada correctamente')
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Failed to delete credential', 'error')
+      toast.showToast(err?.response?.data?.message || 'Error al eliminar la credencial', 'error')
     }
   }
 
@@ -90,24 +90,24 @@ export function Credentials() {
       c.clientName.toLowerCase().includes(search.toLowerCase()),
   )
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Loading...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Credentials</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Credenciales</h1>
         <button
           onClick={openCreate}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
-          + Add Credential
+          + Agregar credencial
         </button>
       </div>
 
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search by system, username or client..."
+          placeholder="Buscar por sistema, usuario o cliente..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -119,11 +119,11 @@ export function Credentials() {
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
               <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">Client</th>
-              <th className="px-4 py-3">System</th>
-              <th className="px-4 py-3">Username</th>
+              <th className="px-4 py-3">Cliente</th>
+              <th className="px-4 py-3">Sistema</th>
+              <th className="px-4 py-3">Usuario</th>
               <th className="px-4 py-3">URL</th>
-              <th className="px-4 py-3">Actions</th>
+              <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -148,13 +148,13 @@ export function Credentials() {
                       onClick={() => openEdit(cred)}
                       className="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100"
                     >
-                      Edit
+                      Editar
                     </button>
                     <button
                       onClick={() => handleDelete(cred)}
                       className="rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-100"
                     >
-                      Delete
+                      Eliminar
                     </button>
                   </div>
                 </td>
@@ -163,7 +163,7 @@ export function Credentials() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
-                  No credentials found.
+                  No se encontraron credenciales.
                 </td>
               </tr>
             )}
@@ -171,17 +171,17 @@ export function Credentials() {
         </table>
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingCred ? 'Edit Credential' : 'Create Credential'}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingCred ? 'Editar credencial' : 'Crear credencial'}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Client</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Cliente</label>
             <select
               required
               value={form.clientId}
               onChange={(e) => setForm({ ...form, clientId: Number(e.target.value) })}
               className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value={0} disabled>Select a client</option>
+              <option value={0} disabled>Selecciona un cliente</option>
               {clients.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -190,7 +190,7 @@ export function Credentials() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">System</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Sistema</label>
             <input
               required
               value={form.systemName}
@@ -199,7 +199,7 @@ export function Credentials() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Username</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Usuario</label>
             <input
               required
               value={form.username}
@@ -208,7 +208,7 @@ export function Credentials() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Password</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Contraseña</label>
             <input
               required
               value={form.encryptedPassword}
@@ -225,7 +225,7 @@ export function Credentials() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Notes</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Notas</label>
             <textarea
               rows={3}
               value={form.notes ?? ''}
@@ -239,14 +239,14 @@ export function Credentials() {
               onClick={() => setModalOpen(false)}
               className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {submitting ? 'Saving...' : editingCred ? 'Update' : 'Create'}
+              {submitting ? 'Guardando...' : editingCred ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>

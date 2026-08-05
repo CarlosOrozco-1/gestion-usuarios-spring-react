@@ -19,7 +19,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           </svg>
         </button>
         <h2 className="text-lg font-semibold text-gray-700">
-          Welcome, {user?.name}
+          Bienvenido, {user?.name}
         </h2>
       </div>
       <div className="flex items-center gap-4">
@@ -31,7 +31,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           onClick={logout}
           className="rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-300"
         >
-          Logout
+          Salir
         </button>
       </div>
     </header>

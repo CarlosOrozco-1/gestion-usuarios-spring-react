@@ -19,7 +19,7 @@ export function Clients() {
   useEffect(() => {
     clientsApi.findAll()
       .then(setClients)
-      .catch((err) => toast.showToast(err?.response?.data?.message || 'Failed to load clients', 'error'))
+      .catch((err) => toast.showToast(err?.response?.data?.message || 'Error al cargar los clientes', 'error'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -42,15 +42,15 @@ export function Clients() {
       if (editingClient) {
         const updated = await clientsApi.update(editingClient.id, form)
         setClients((prev) => prev.map((c) => (c.id === editingClient.id ? updated : c)))
-        toast.showToast('Client updated successfully')
+        toast.showToast('Cliente actualizado correctamente')
       } else {
         const created = await clientsApi.create(form)
         setClients((prev) => [...prev, created])
-        toast.showToast('Client created successfully')
+        toast.showToast('Cliente creado correctamente')
       }
       setModalOpen(false)
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Operation failed', 'error')
+      toast.showToast(err?.response?.data?.message || 'La operación falló', 'error')
     } finally {
       setSubmitting(false)
     }
@@ -60,16 +60,16 @@ export function Clients() {
     try {
       if (client.active) {
         await clientsApi.deactivate(client.id)
-        toast.showToast('Client deactivated')
+        toast.showToast('Cliente desactivado')
       } else {
         await clientsApi.reactivate(client.id)
-        toast.showToast('Client reactivated')
+        toast.showToast('Cliente reactivado')
       }
       setClients((prev) =>
         prev.map((c) => (c.id === client.id ? { ...c, active: !c.active } : c)),
       )
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Operation failed', 'error')
+      toast.showToast(err?.response?.data?.message || 'La operación falló', 'error')
     }
   }
 
@@ -80,24 +80,24 @@ export function Clients() {
       c.idNumber.toLowerCase().includes(search.toLowerCase()),
   )
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Loading...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Clients</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Clientes</h1>
         <button
           onClick={openCreate}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
-          + Add Client
+          + Agregar cliente
         </button>
       </div>
 
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search by name, email or ID number..."
+          placeholder="Buscar por nombre, correo o número de identificación..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -109,13 +109,13 @@ export function Clients() {
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
               <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">ID Number</th>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Phone</th>
-              <th className="px-4 py-3">Address</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Actions</th>
+              <th className="px-4 py-3">N° Identificación</th>
+              <th className="px-4 py-3">Nombre</th>
+              <th className="px-4 py-3">Correo</th>
+              <th className="px-4 py-3">Teléfono</th>
+              <th className="px-4 py-3">Dirección</th>
+              <th className="px-4 py-3">Estado</th>
+              <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -142,7 +142,7 @@ export function Clients() {
                       onClick={() => openEdit(client)}
                       className="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100"
                     >
-                      Edit
+                      Editar
                     </button>
                     <button
                       onClick={() => toggleStatus(client)}
@@ -152,7 +152,7 @@ export function Clients() {
                           : 'bg-green-50 text-green-600 hover:bg-green-100'
                       }`}
                     >
-                      {client.active ? 'Deactivate' : 'Reactivate'}
+                      {client.active ? 'Desactivar' : 'Reactivar'}
                     </button>
                   </div>
                 </td>
@@ -161,7 +161,7 @@ export function Clients() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
-                  No clients found.
+                  No se encontraron clientes.
                 </td>
               </tr>
             )}
@@ -169,10 +169,10 @@ export function Clients() {
         </table>
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingClient ? 'Edit Client' : 'Create Client'}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingClient ? 'Editar cliente' : 'Crear cliente'}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">ID Number</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Número de identificación</label>
             <input
               required
               value={form.idNumber}
@@ -181,7 +181,7 @@ export function Clients() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Nombre</label>
             <input
               required
               value={form.name}
@@ -190,7 +190,7 @@ export function Clients() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Correo electrónico</label>
             <input
               type="email"
               required
@@ -200,7 +200,7 @@ export function Clients() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Phone</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Teléfono</label>
             <input
               value={form.phone ?? ''}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -208,7 +208,7 @@ export function Clients() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Address</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Dirección</label>
             <textarea
               rows={3}
               value={form.address ?? ''}
@@ -222,14 +222,14 @@ export function Clients() {
               onClick={() => setModalOpen(false)}
               className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {submitting ? 'Saving...' : editingClient ? 'Update' : 'Create'}
+              {submitting ? 'Guardando...' : editingClient ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>

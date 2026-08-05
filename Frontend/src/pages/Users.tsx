@@ -21,7 +21,7 @@ export function Users() {
   useEffect(() => {
     Promise.all([usersApi.findAll(), rolesApi.findAll()])
       .then(([u, r]) => { setUsers(u); setRoles(r) })
-      .catch((err) => toast.showToast(err?.response?.data?.message || 'Failed to load users', 'error'))
+      .catch((err) => toast.showToast(err?.response?.data?.message || 'Error al cargar los usuarios', 'error'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -45,15 +45,15 @@ export function Users() {
       if (editingUser) {
         const updated = await usersApi.update(editingUser.id, form)
         setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? updated : u)))
-        toast.showToast('User updated successfully')
+        toast.showToast('Usuario actualizado correctamente')
       } else {
         const created = await usersApi.create(form)
         setUsers((prev) => [...prev, created])
-        toast.showToast('User created successfully')
+        toast.showToast('Usuario creado correctamente')
       }
       setModalOpen(false)
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Operation failed', 'error')
+      toast.showToast(err?.response?.data?.message || 'La operación falló', 'error')
     } finally {
       setSubmitting(false)
     }
@@ -63,16 +63,16 @@ export function Users() {
     try {
       if (user.active) {
         await usersApi.deactivate(user.id)
-        toast.showToast('User deactivated')
+        toast.showToast('Usuario desactivado')
       } else {
         await usersApi.reactivate(user.id)
-        toast.showToast('User reactivated')
+        toast.showToast('Usuario reactivado')
       }
       setUsers((prev) =>
         prev.map((u) => (u.id === user.id ? { ...u, active: !u.active, status: u.active ? 'INACTIVE' : 'ACTIVE' } : u)),
       )
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Operation failed', 'error')
+      toast.showToast(err?.response?.data?.message || 'La operación falló', 'error')
     }
   }
 
@@ -83,24 +83,24 @@ export function Users() {
       u.idNumber.toLowerCase().includes(search.toLowerCase()),
   )
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Loading...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Users</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Usuarios</h1>
         <button
           onClick={openCreate}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
-          + Add User
+          + Agregar usuario
         </button>
       </div>
 
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search by name, email or ID number..."
+          placeholder="Buscar por nombre, correo o número de identificación..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -112,12 +112,12 @@ export function Users() {
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
               <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">ID Number</th>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Actions</th>
+              <th className="px-4 py-3">N° Identificación</th>
+              <th className="px-4 py-3">Nombre</th>
+              <th className="px-4 py-3">Correo</th>
+              <th className="px-4 py-3">Rol</th>
+              <th className="px-4 py-3">Estado</th>
+              <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -147,7 +147,7 @@ export function Users() {
                       onClick={() => openEdit(user)}
                       className="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100"
                     >
-                      Edit
+                      Editar
                     </button>
                     <button
                       onClick={() => toggleStatus(user)}
@@ -157,7 +157,7 @@ export function Users() {
                           : 'bg-green-50 text-green-600 hover:bg-green-100'
                       }`}
                     >
-                      {user.active ? 'Deactivate' : 'Reactivate'}
+                    {user.active ? 'Desactivar' : 'Reactivar'}
                     </button>
                   </div>
                 </td>
@@ -166,7 +166,7 @@ export function Users() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                  No users found.
+                  No se encontraron usuarios.
                 </td>
               </tr>
             )}
@@ -174,10 +174,10 @@ export function Users() {
         </table>
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingUser ? 'Edit User' : 'Create User'}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingUser ? 'Editar usuario' : 'Crear usuario'}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">ID Number</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Número de identificación</label>
             <input
               required
               value={form.idNumber}
@@ -186,7 +186,7 @@ export function Users() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Nombre</label>
             <input
               required
               value={form.name}
@@ -195,7 +195,7 @@ export function Users() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Correo electrónico</label>
             <input
               type="email"
               required
@@ -206,7 +206,7 @@ export function Users() {
           </div>
           {!editingUser && (
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Password</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Contraseña</label>
               <input
                 type="password"
                 required
@@ -217,14 +217,14 @@ export function Users() {
             </div>
           )}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Role</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Rol</label>
             <select
               required
               value={form.roleId}
               onChange={(e) => setForm({ ...form, roleId: Number(e.target.value) })}
               className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value={0} disabled>Select a role</option>
+              <option value={0} disabled>Selecciona un rol</option>
               {roles.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
@@ -238,14 +238,14 @@ export function Users() {
               onClick={() => setModalOpen(false)}
               className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {submitting ? 'Saving...' : editingUser ? 'Update' : 'Create'}
+              {submitting ? 'Guardando...' : editingUser ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>

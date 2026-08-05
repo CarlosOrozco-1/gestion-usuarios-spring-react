@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom'
 
 const links = [
-  { to: '/', label: 'Dashboard', icon: '📊' },
-  { to: '/users', label: 'Users', icon: '👥' },
-  { to: '/clients', label: 'Clients', icon: '🧑‍💼' },
-  { to: '/credentials', label: 'Credentials', icon: '🔑' },
+  { to: '/', label: 'Panel', icon: '📊' },
+  { to: '/users', label: 'Usuarios', icon: '👥' },
+  { to: '/clients', label: 'Clientes', icon: '🧑‍💼' },
+  { to: '/credentials', label: 'Credenciales', icon: '🔑' },
   { to: '/roles', label: 'Roles', icon: '🔐' },
-  { to: '/permissions', label: 'Permissions', icon: '⚙️' },
+  { to: '/permissions', label: 'Permisos', icon: '⚙️' },
 ]
 
 interface SidebarProps {

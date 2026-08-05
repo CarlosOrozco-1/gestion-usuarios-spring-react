@@ -18,7 +18,7 @@ export function Permissions() {
   useEffect(() => {
     permissionsApi.findAll()
       .then(setPermissions)
-      .catch((err) => toast.showToast(err?.response?.data?.message || 'Failed to load permissions', 'error'))
+      .catch((err) => toast.showToast(err?.response?.data?.message || 'Error al cargar los permisos', 'error'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -41,42 +41,42 @@ export function Permissions() {
       if (editing) {
         const updated = await permissionsApi.update(editing.id, form)
         setPermissions((prev) => prev.map((p) => (p.id === editing.id ? updated : p)))
-        toast.showToast('Permission updated successfully')
+        toast.showToast('Permiso actualizado correctamente')
       } else {
         const created = await permissionsApi.create(form)
         setPermissions((prev) => [...prev, created])
-        toast.showToast('Permission created successfully')
+        toast.showToast('Permiso creado correctamente')
       }
       setModalOpen(false)
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Operation failed', 'error')
+      toast.showToast(err?.response?.data?.message || 'La operación falló', 'error')
     } finally {
       setSubmitting(false)
     }
   }
 
   async function handleDelete(perm: PermissionResponse) {
-    if (!window.confirm(`Delete permission "${perm.name}"? This action cannot be undone.`)) return
+    if (!window.confirm(`¿Eliminar el permiso "${perm.name}"? Esta acción no se puede deshacer.`)) return
     try {
       await permissionsApi.delete(perm.id)
       setPermissions((prev) => prev.filter((p) => p.id !== perm.id))
-      toast.showToast('Permission deleted successfully')
+      toast.showToast('Permiso eliminado correctamente')
     } catch (err: any) {
-      toast.showToast(err?.response?.data?.message || 'Failed to delete permission', 'error')
+      toast.showToast(err?.response?.data?.message || 'Error al eliminar el permiso', 'error')
     }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Loading...</div>
+  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Permissions</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Permisos</h1>
         <button
           onClick={openCreate}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
-          + Add Permission
+          + Agregar permiso
         </button>
       </div>
 
@@ -85,11 +85,11 @@ export function Permissions() {
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
               <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Description</th>
-              <th className="px-4 py-3">Resource Path</th>
-              <th className="px-4 py-3">Created</th>
-              <th className="px-4 py-3">Actions</th>
+              <th className="px-4 py-3">Nombre</th>
+              <th className="px-4 py-3">Descripción</th>
+              <th className="px-4 py-3">Ruta del recurso</th>
+              <th className="px-4 py-3">Creado</th>
+              <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -110,13 +110,13 @@ export function Permissions() {
                       onClick={() => openEdit(perm)}
                       className="rounded bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100"
                     >
-                      Edit
+                      Editar
                     </button>
                     <button
                       onClick={() => handleDelete(perm)}
                       className="rounded bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-100"
                     >
-                      Delete
+                      Eliminar
                     </button>
                   </div>
                 </td>
@@ -125,7 +125,7 @@ export function Permissions() {
             {permissions.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
-                  No permissions found.
+                  No se encontraron permisos.
                 </td>
               </tr>
             )}
@@ -133,10 +133,10 @@ export function Permissions() {
         </table>
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Permission' : 'Create Permission'}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar permiso' : 'Crear permiso'}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Nombre</label>
             <input
               required
               value={form.name}
@@ -145,7 +145,7 @@ export function Permissions() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Descripción</label>
             <textarea
               rows={3}
               value={form.description ?? ''}
@@ -154,7 +154,7 @@ export function Permissions() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Resource Path</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Ruta del recurso</label>
             <input
               value={form.resourcePath ?? ''}
               onChange={(e) => setForm({ ...form, resourcePath: e.target.value })}
@@ -168,14 +168,14 @@ export function Permissions() {
               onClick={() => setModalOpen(false)}
               className="rounded-lg border px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {submitting ? 'Saving...' : editing ? 'Update' : 'Create'}
+              {submitting ? 'Guardando...' : editing ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>
