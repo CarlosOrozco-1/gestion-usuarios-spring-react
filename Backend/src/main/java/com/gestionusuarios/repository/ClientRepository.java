@@ -9,4 +9,5 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
     Optional<Client> findByEmail(String email);
     boolean existsByIdNumber(String idNumber);
     boolean existsByEmail(String email);
+    long countByActive(boolean active);
 }

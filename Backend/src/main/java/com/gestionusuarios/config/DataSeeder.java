@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -30,6 +31,9 @@ public class DataSeeder implements CommandLineRunner {
     private static final Map<String, String> PERMISSIONS = new LinkedHashMap<>();
 
     static {
+        // Dashboard permissions
+        PERMISSIONS.put("VIEW_DASHBOARD", "/api/dashboard");
+
         // System User permissions
         PERMISSIONS.put("ADMIN_USERS", "/api/system-users");
         PERMISSIONS.put("ADMIN_ROLES", "/api/roles");
@@ -49,15 +53,18 @@ public class DataSeeder implements CommandLineRunner {
 
     static {
         ROLE_PERMISSIONS.put("ADMIN", Set.of(
+                "VIEW_DASHBOARD",
                 "ADMIN_USERS", "ADMIN_ROLES", "ADMIN_PERMISSIONS", "ASSIGN_PERMISSIONS",
                 "VIEW_CLIENTS", "MANAGE_CLIENTS",
                 "VIEW_CREDENTIALS", "MANAGE_CREDENTIALS"
         ));
         ROLE_PERMISSIONS.put("CONTADOR", Set.of(
+                "VIEW_DASHBOARD",
                 "VIEW_CLIENTS", "MANAGE_CLIENTS",
                 "VIEW_CREDENTIALS", "MANAGE_CREDENTIALS"
         ));
         ROLE_PERMISSIONS.put("ASISTENTE", Set.of(
+                "VIEW_DASHBOARD",
                 "VIEW_CLIENTS",
                 "VIEW_CREDENTIALS"
         ));
@@ -88,17 +95,21 @@ public class DataSeeder implements CommandLineRunner {
             String roleName = entry.getKey();
             Set<String> permNames = entry.getValue();
 
-            if (roleRepository.findByName(roleName).isPresent()) {
-                continue;
-            }
+            Role role = roleRepository.findByName(roleName)
+                    .orElseGet(() -> roleRepository.save(Role.builder()
+                            .name(roleName)
+                            .description(roleName + " role")
+                            .status(Status.ACTIVE)
+                            .build()));
 
-            Role role = roleRepository.save(Role.builder()
-                    .name(roleName)
-                    .description(roleName + " role")
-                    .status(Status.ACTIVE)
-                    .build());
+            Set<String> existing = role.getRolePermissions().stream()
+                    .map(rp -> rp.getPermission().getName())
+                    .collect(Collectors.toSet());
 
             for (String permName : permNames) {
+                if (existing.contains(permName)) {
+                    continue;
+                }
                 permissionRepository.findByName(permName).ifPresent(permission -> {
                     role.getRolePermissions().add(PermissionRole.builder()
                             .role(role)
