@@ -4,7 +4,11 @@ import { Modal } from '../components/Modal'
 import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { Pagination } from '../components/Pagination'
+import { SortableTh } from '../components/SortableTh'
 import { useToast } from '../hooks/useToast'
+import { useTable } from '../hooks/useTable'
+import { useFormErrors, validators, validateForm } from '../hooks/useFormErrors'
 import type { PermissionResponse, PermissionRequest } from '../types'
 
 const emptyForm: PermissionRequest = { name: '', description: '', resourcePath: '' }
@@ -19,6 +23,7 @@ export function Permissions() {
   const [submitting, setSubmitting] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<PermissionResponse | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const { errors, setErrors, clearError } = useFormErrors()
 
   useEffect(() => {
     permissionsApi.findAll()
@@ -41,6 +46,11 @@ export function Permissions() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const errs = validateForm(form, { name: validators.required() })
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs as Record<string, string>)
+      return
+    }
     setSubmitting(true)
     try {
       if (editing) {
@@ -79,11 +89,13 @@ export function Permissions() {
     }
   }
 
+  const table = useTable(permissions, 5)
+
   if (loading) return <Spinner />
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-800">Permisos</h1>
         <button
           onClick={openCreate}
@@ -97,16 +109,16 @@ export function Permissions() {
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
-              <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">Nombre</th>
-              <th className="px-4 py-3">Descripción</th>
-              <th className="px-4 py-3">Ruta del recurso</th>
-              <th className="px-4 py-3">Creado</th>
+              <SortableTh label="ID" sortKey="id" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Nombre" sortKey="name" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Descripción" sortKey="description" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Ruta del recurso" sortKey="resourcePath" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Creado" sortKey="createdAt" sort={table.sort} onSort={table.toggleSort} />
               <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
-            {permissions.map((perm) => (
+            {table.rows.map((perm) => (
               <tr key={perm.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-gray-500">{perm.id}</td>
                 <td className="px-4 py-3 font-medium">{perm.name}</td>
@@ -138,6 +150,7 @@ export function Permissions() {
             {permissions.length === 0 && <EmptyState message="No se encontraron permisos." colSpan={6} />}
           </tbody>
         </table>
+        <Pagination page={table.page} pageCount={table.pageCount} total={table.total} pageSize={5} onChange={table.goToPage} />
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar permiso' : 'Crear permiso'}>
@@ -145,11 +158,11 @@ export function Permissions() {
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Nombre</label>
             <input
-              required
               value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, name: e.target.value }); clearError('name') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-400' : ''}`}
             />
+            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Descripción</label>

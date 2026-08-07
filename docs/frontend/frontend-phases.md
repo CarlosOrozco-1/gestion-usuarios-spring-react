@@ -72,9 +72,10 @@
 - [x] Empty state components (componente `EmptyState`)
 - [x] Confirm dialogs for destructive actions (componente `ConfirmDialog` reemplaza `window.confirm`)
 
-## Phase 10: Polish ⬜
-- [ ] Pagination on list pages
-- [ ] Sortable columns
-- [ ] Form validation feedback
-- [ ] Responsive design pass
-- [ ] Dark mode (optional)
+## Phase 10: Polish ✅
+- [x] Pagination on list pages (hook `useTable` + componente `Pagination`, 5 páginas)
+- [x] Sortable columns (componente `SortableTh`)
+- [x] Form validation feedback (hook `useFormErrors` con validación inline)
+- [x] Responsive design pass (encabezados con `flex-wrap`, tablas con scroll horizontal)
+- [ ] Dark mode (opcional, pendiente)
+- [x] Login rediseñado (pantalla dividida, panel de marca + formulario)

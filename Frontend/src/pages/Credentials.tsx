@@ -4,8 +4,12 @@ import { clientsApi } from '../api/clients'
 import { Modal } from '../components/Modal'
 import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
+import { Pagination } from '../components/Pagination'
+import { SortableTh } from '../components/SortableTh'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useToast } from '../hooks/useToast'
+import { useTable } from '../hooks/useTable'
+import { useFormErrors, validators, validateForm } from '../hooks/useFormErrors'
 import type { CredentialResponse, CredentialRequest, ClientResponse } from '../types'
 
 const emptyForm: CredentialRequest = {
@@ -29,6 +33,7 @@ export function Credentials() {
   const [submitting, setSubmitting] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<CredentialResponse | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const { errors, setErrors, clearError } = useFormErrors()
 
   useEffect(() => {
     Promise.all([credentialsApi.findAll(), clientsApi.findAll()])
@@ -58,6 +63,16 @@ export function Credentials() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const errs = validateForm(form, {
+      clientId: (v) => (v ? null : 'Selecciona un cliente'),
+      systemName: validators.required(),
+      username: validators.required(),
+      encryptedPassword: validators.required(),
+    })
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs as Record<string, string>)
+      return
+    }
     setSubmitting(true)
     try {
       if (editingCred) {
@@ -103,11 +118,13 @@ export function Credentials() {
       c.clientName.toLowerCase().includes(search.toLowerCase()),
   )
 
+  const table = useTable(filtered, 5)
+
   if (loading) return <Spinner />
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-800">Credenciales</h1>
         <button
           onClick={openCreate}
@@ -131,16 +148,16 @@ export function Credentials() {
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
-              <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">Cliente</th>
-              <th className="px-4 py-3">Sistema</th>
-              <th className="px-4 py-3">Usuario</th>
-              <th className="px-4 py-3">URL</th>
+              <SortableTh label="ID" sortKey="id" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Cliente" sortKey="clientName" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Sistema" sortKey="systemName" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Usuario" sortKey="username" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="URL" sortKey="url" sort={table.sort} onSort={table.toggleSort} />
               <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.map((cred) => (
+            {table.rows.map((cred) => (
               <tr key={cred.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-gray-500">{cred.id}</td>
                 <td className="px-4 py-3 font-medium">{cred.clientName}</td>
@@ -176,6 +193,7 @@ export function Credentials() {
             {filtered.length === 0 && <EmptyState message="No se encontraron credenciales." colSpan={6} />}
           </tbody>
         </table>
+        <Pagination page={table.page} pageCount={table.pageCount} total={table.total} pageSize={5} onChange={table.goToPage} />
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingCred ? 'Editar credencial' : 'Crear credencial'}>
@@ -183,10 +201,9 @@ export function Credentials() {
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Cliente</label>
             <select
-              required
               value={form.clientId}
-              onChange={(e) => setForm({ ...form, clientId: Number(e.target.value) })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, clientId: Number(e.target.value) }); clearError('clientId') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.clientId ? 'border-red-400' : ''}`}
             >
               <option value={0} disabled>Selecciona un cliente</option>
               {clients.map((c) => (
@@ -195,33 +212,34 @@ export function Credentials() {
                 </option>
               ))}
             </select>
+            {errors.clientId && <p className="mt-1 text-xs text-red-600">{errors.clientId}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Sistema</label>
             <input
-              required
               value={form.systemName}
-              onChange={(e) => setForm({ ...form, systemName: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, systemName: e.target.value }); clearError('systemName') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.systemName ? 'border-red-400' : ''}`}
             />
+            {errors.systemName && <p className="mt-1 text-xs text-red-600">{errors.systemName}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Usuario</label>
             <input
-              required
               value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, username: e.target.value }); clearError('username') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.username ? 'border-red-400' : ''}`}
             />
+            {errors.username && <p className="mt-1 text-xs text-red-600">{errors.username}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Contraseña</label>
             <input
-              required
               value={form.encryptedPassword}
-              onChange={(e) => setForm({ ...form, encryptedPassword: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, encryptedPassword: e.target.value }); clearError('encryptedPassword') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.encryptedPassword ? 'border-red-400' : ''}`}
             />
+            {errors.encryptedPassword && <p className="mt-1 text-xs text-red-600">{errors.encryptedPassword}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">URL</label>

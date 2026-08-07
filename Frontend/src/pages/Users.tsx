@@ -4,7 +4,11 @@ import { rolesApi } from '../api/roles'
 import { Modal } from '../components/Modal'
 import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
+import { Pagination } from '../components/Pagination'
+import { SortableTh } from '../components/SortableTh'
 import { useToast } from '../hooks/useToast'
+import { useTable } from '../hooks/useTable'
+import { useFormErrors, validators, validateForm } from '../hooks/useFormErrors'
 import type { UserResponse, UserRequest, RoleResponse } from '../types'
 
 const emptyForm: UserRequest = { idNumber: '', name: '', email: '', password: '', roleId: 0 }
@@ -19,6 +23,7 @@ export function Users() {
   const [editingUser, setEditingUser] = useState<UserResponse | null>(null)
   const [form, setForm] = useState<UserRequest>(emptyForm)
   const [submitting, setSubmitting] = useState(false)
+  const { errors, setErrors, clearError } = useFormErrors()
 
   useEffect(() => {
     Promise.all([usersApi.findAll(), rolesApi.findAll()])
@@ -42,6 +47,17 @@ export function Users() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const errs = validateForm(form, {
+      idNumber: validators.required(),
+      name: validators.required(),
+      email: validators.required(),
+      ...(!editingUser ? { password: validators.minLength(6) } : {}),
+      roleId: (v) => (v ? null : 'Selecciona un rol'),
+    })
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs as Record<string, string>)
+      return
+    }
     setSubmitting(true)
     try {
       if (editingUser) {
@@ -85,11 +101,13 @@ export function Users() {
       u.idNumber.toLowerCase().includes(search.toLowerCase()),
   )
 
+  const table = useTable(filtered, 5)
+
   if (loading) return <Spinner />
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-800">Usuarios</h1>
         <button
           onClick={openCreate}
@@ -113,17 +131,17 @@ export function Users() {
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
-              <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">N° Identificación</th>
-              <th className="px-4 py-3">Nombre</th>
-              <th className="px-4 py-3">Correo</th>
-              <th className="px-4 py-3">Rol</th>
+              <SortableTh label="ID" sortKey="id" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="N° Identificación" sortKey="idNumber" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Nombre" sortKey="name" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Correo" sortKey="email" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Rol" sortKey="roleName" sort={table.sort} onSort={table.toggleSort} />
               <th className="px-4 py-3">Estado</th>
               <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.map((user) => (
+            {table.rows.map((user) => (
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-gray-500">{user.id}</td>
                 <td className="px-4 py-3 font-medium">{user.idNumber}</td>
@@ -168,6 +186,7 @@ export function Users() {
             {filtered.length === 0 && <EmptyState message="No se encontraron usuarios." colSpan={7} />}
           </tbody>
         </table>
+        <Pagination page={table.page} pageCount={table.pageCount} total={table.total} pageSize={5} onChange={table.goToPage} />
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingUser ? 'Editar usuario' : 'Crear usuario'}>
@@ -175,50 +194,49 @@ export function Users() {
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Número de identificación</label>
             <input
-              required
               value={form.idNumber}
-              onChange={(e) => setForm({ ...form, idNumber: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, idNumber: e.target.value }); clearError('idNumber') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idNumber ? 'border-red-400' : ''}`}
             />
+            {errors.idNumber && <p className="mt-1 text-xs text-red-600">{errors.idNumber}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Nombre</label>
             <input
-              required
               value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, name: e.target.value }); clearError('name') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-400' : ''}`}
             />
+            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Correo electrónico</label>
             <input
               type="email"
-              required
               value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, email: e.target.value }); clearError('email') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-400' : ''}`}
             />
+            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
           </div>
           {!editingUser && (
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Contraseña</label>
               <input
                 type="password"
-                required
                 value={form.password ?? ''}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => { setForm({ ...form, password: e.target.value }); clearError('password') }}
+                className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password ? 'border-red-400' : ''}`}
               />
+              {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
             </div>
           )}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Rol</label>
             <select
-              required
               value={form.roleId}
-              onChange={(e) => setForm({ ...form, roleId: Number(e.target.value) })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, roleId: Number(e.target.value) }); clearError('roleId') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.roleId ? 'border-red-400' : ''}`}
             >
               <option value={0} disabled>Selecciona un rol</option>
               {roles.map((r) => (
@@ -227,6 +245,7 @@ export function Users() {
                 </option>
               ))}
             </select>
+            {errors.roleId && <p className="mt-1 text-xs text-red-600">{errors.roleId}</p>}
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <button

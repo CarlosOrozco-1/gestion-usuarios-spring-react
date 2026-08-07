@@ -4,7 +4,12 @@ import { permissionsApi } from '../api/permissions'
 import { Modal } from '../components/Modal'
 import { Spinner } from '../components/Spinner'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { EmptyState } from '../components/EmptyState'
+import { Pagination } from '../components/Pagination'
+import { SortableTh } from '../components/SortableTh'
 import { useToast } from '../hooks/useToast'
+import { useTable } from '../hooks/useTable'
+import { useFormErrors, validators, validateForm } from '../hooks/useFormErrors'
 import type { RoleResponse, RoleRequest, PermissionResponse } from '../types'
 
 const emptyForm: RoleRequest = { name: '', description: '' }
@@ -21,6 +26,7 @@ export function Roles() {
   const [submitting, setSubmitting] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<RoleResponse | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const { errors, setErrors, clearError } = useFormErrors()
 
   const [permModal, setPermModal] = useState(false)
   const [permRole, setPermRole] = useState<RoleResponse | null>(null)
@@ -47,6 +53,11 @@ export function Roles() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const errs = validateForm(form, { name: validators.required() })
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs as Record<string, string>)
+      return
+    }
     setSubmitting(true)
     try {
       if (editingRole) {
@@ -109,11 +120,13 @@ export function Roles() {
     )
   }
 
+  const table = useTable(roles, 5)
+
   if (loading) return <Spinner />
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-800">Roles</h1>
         <button
           onClick={openCreate}
@@ -127,16 +140,16 @@ export function Roles() {
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
-              <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">Nombre</th>
-              <th className="px-4 py-3">Descripción</th>
+              <SortableTh label="ID" sortKey="id" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Nombre" sortKey="name" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Descripción" sortKey="description" sort={table.sort} onSort={table.toggleSort} />
               <th className="px-4 py-3">Permisos</th>
-              <th className="px-4 py-3">Estado</th>
+              <SortableTh label="Estado" sortKey="status" sort={table.sort} onSort={table.toggleSort} />
               <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
-            {roles.map((role) => (
+            {table.rows.map((role) => (
               <tr key={role.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-gray-500">{role.id}</td>
                 <td className="px-4 py-3 font-medium">{role.name}</td>
@@ -176,8 +189,10 @@ export function Roles() {
                 </td>
               </tr>
             ))}
+            {table.total === 0 && <EmptyState message="No se encontraron roles." colSpan={6} />}
           </tbody>
         </table>
+        <Pagination page={table.page} pageCount={table.pageCount} total={table.total} pageSize={5} onChange={table.goToPage} />
       </div>
 
       <Modal open={formModal} onClose={() => setFormModal(false)} title={editingRole ? 'Editar rol' : 'Crear rol'}>
@@ -185,11 +200,11 @@ export function Roles() {
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Nombre</label>
             <input
-              required
               value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, name: e.target.value }); clearError('name') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-400' : ''}`}
             />
+            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Descripción</label>

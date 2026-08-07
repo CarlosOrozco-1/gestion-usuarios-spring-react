@@ -3,7 +3,11 @@ import { clientsApi } from '../api/clients'
 import { Modal } from '../components/Modal'
 import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
+import { Pagination } from '../components/Pagination'
+import { SortableTh } from '../components/SortableTh'
 import { useToast } from '../hooks/useToast'
+import { useTable } from '../hooks/useTable'
+import { useFormErrors, validators, validateForm } from '../hooks/useFormErrors'
 import type { ClientResponse, ClientRequest } from '../types'
 
 const emptyForm: ClientRequest = {
@@ -26,6 +30,7 @@ export function Clients() {
   const [editingClient, setEditingClient] = useState<ClientResponse | null>(null)
   const [form, setForm] = useState<ClientRequest>(emptyForm)
   const [submitting, setSubmitting] = useState(false)
+  const { errors, setErrors, clearError } = useFormErrors()
 
   useEffect(() => {
     clientsApi.findAll()
@@ -57,6 +62,17 @@ export function Clients() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const errs = validateForm(form, {
+      idNumber: validators.required(),
+      nit: validators.required(),
+      businessName: validators.required(),
+      taxRegime: validators.required(),
+      email: validators.required(),
+    })
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs as Record<string, string>)
+      return
+    }
     setSubmitting(true)
     const payload: ClientRequest = { ...form, birthDate: form.birthDate || null }
     try {
@@ -102,11 +118,13 @@ export function Clients() {
       c.idNumber.toLowerCase().includes(search.toLowerCase()),
   )
 
+  const table = useTable(filtered, 5)
+
   if (loading) return <Spinner />
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-800">Clientes</h1>
         <button
           onClick={openCreate}
@@ -130,21 +148,21 @@ export function Clients() {
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
-              <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">N° Identificación</th>
-              <th className="px-4 py-3">NIT</th>
-              <th className="px-4 py-3">Razón social</th>
-              <th className="px-4 py-3">Régimen fiscal</th>
-              <th className="px-4 py-3">Fecha nacimiento</th>
-              <th className="px-4 py-3">Correo</th>
-              <th className="px-4 py-3">Teléfono</th>
-              <th className="px-4 py-3">Dirección</th>
+              <SortableTh label="ID" sortKey="id" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="N° Identificación" sortKey="idNumber" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="NIT" sortKey="nit" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Razón social" sortKey="businessName" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Régimen fiscal" sortKey="taxRegime" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Fecha nacimiento" sortKey="birthDate" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Correo" sortKey="email" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Teléfono" sortKey="phone" sort={table.sort} onSort={table.toggleSort} />
+              <SortableTh label="Dirección" sortKey="address" sort={table.sort} onSort={table.toggleSort} />
               <th className="px-4 py-3">Estado</th>
               <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.map((client) => (
+            {table.rows.map((client) => (
               <tr key={client.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-gray-500">{client.id}</td>
                 <td className="px-4 py-3 font-medium">{client.idNumber}</td>
@@ -189,6 +207,7 @@ export function Clients() {
             {filtered.length === 0 && <EmptyState message="No se encontraron clientes." colSpan={11} />}
           </tbody>
         </table>
+        <Pagination page={table.page} pageCount={table.pageCount} total={table.total} pageSize={5} onChange={table.goToPage} />
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingClient ? 'Editar cliente' : 'Crear cliente'}>
@@ -196,38 +215,38 @@ export function Clients() {
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Número de identificación</label>
             <input
-              required
               value={form.idNumber}
-              onChange={(e) => setForm({ ...form, idNumber: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, idNumber: e.target.value }); clearError('idNumber') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idNumber ? 'border-red-400' : ''}`}
             />
+            {errors.idNumber && <p className="mt-1 text-xs text-red-600">{errors.idNumber}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">NIT</label>
             <input
-              required
               value={form.nit}
-              onChange={(e) => setForm({ ...form, nit: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, nit: e.target.value }); clearError('nit') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.nit ? 'border-red-400' : ''}`}
             />
+            {errors.nit && <p className="mt-1 text-xs text-red-600">{errors.nit}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Razón social</label>
             <input
-              required
               value={form.businessName}
-              onChange={(e) => setForm({ ...form, businessName: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, businessName: e.target.value }); clearError('businessName') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.businessName ? 'border-red-400' : ''}`}
             />
+            {errors.businessName && <p className="mt-1 text-xs text-red-600">{errors.businessName}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Régimen fiscal</label>
             <input
-              required
               value={form.taxRegime}
-              onChange={(e) => setForm({ ...form, taxRegime: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, taxRegime: e.target.value }); clearError('taxRegime') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.taxRegime ? 'border-red-400' : ''}`}
             />
+            {errors.taxRegime && <p className="mt-1 text-xs text-red-600">{errors.taxRegime}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Fecha de nacimiento</label>
@@ -242,11 +261,11 @@ export function Clients() {
             <label className="mb-1 block text-sm font-medium text-gray-700">Correo electrónico</label>
             <input
               type="email"
-              required
               value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => { setForm({ ...form, email: e.target.value }); clearError('email') }}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-400' : ''}`}
             />
+            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Teléfono</label>
