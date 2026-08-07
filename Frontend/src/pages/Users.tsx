@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { usersApi } from '../api/users'
 import { rolesApi } from '../api/roles'
 import { Modal } from '../components/Modal'
+import { Spinner } from '../components/Spinner'
+import { EmptyState } from '../components/EmptyState'
 import { useToast } from '../hooks/useToast'
 import type { UserResponse, UserRequest, RoleResponse } from '../types'
 
@@ -83,7 +85,7 @@ export function Users() {
       u.idNumber.toLowerCase().includes(search.toLowerCase()),
   )
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
+  if (loading) return <Spinner />
 
   return (
     <div>
@@ -163,13 +165,7 @@ export function Users() {
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                  No se encontraron usuarios.
-                </td>
-              </tr>
-            )}
+            {filtered.length === 0 && <EmptyState message="No se encontraron usuarios." colSpan={7} />}
           </tbody>
         </table>
       </div>

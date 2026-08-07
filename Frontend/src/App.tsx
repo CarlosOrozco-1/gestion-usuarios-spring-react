@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './contexts/ToastContext'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { PrivateRoute } from './components/PrivateRoute'
 import { Layout } from './components/Layout'
 import { Login } from './pages/Login'
@@ -13,9 +14,10 @@ import { Permissions } from './pages/Permissions'
 
 function App() {
   return (
-    <BrowserRouter>
-      <ToastProvider>
-      <AuthProvider>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ToastProvider>
+        <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route
@@ -36,7 +38,8 @@ function App() {
         </Routes>
       </AuthProvider>
       </ToastProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 

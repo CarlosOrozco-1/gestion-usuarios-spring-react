@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../hooks/useToast'
 import { dashboardApi } from '../api/dashboard'
+import { Spinner } from '../components/Spinner'
 import type { DashboardStats } from '../types'
 
 const BAR_COLORS = ['bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-violet-500', 'bg-rose-500', 'bg-cyan-500']
@@ -60,7 +61,7 @@ export function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
+  if (loading) return <Spinner />
   if (!stats) return <div className="flex items-center justify-center h-64 text-gray-500">Sin datos disponibles</div>
 
   return (

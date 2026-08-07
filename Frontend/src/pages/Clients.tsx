@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { clientsApi } from '../api/clients'
 import { Modal } from '../components/Modal'
+import { Spinner } from '../components/Spinner'
+import { EmptyState } from '../components/EmptyState'
 import { useToast } from '../hooks/useToast'
 import type { ClientResponse, ClientRequest } from '../types'
 
@@ -100,7 +102,7 @@ export function Clients() {
       c.idNumber.toLowerCase().includes(search.toLowerCase()),
   )
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
+  if (loading) return <Spinner />
 
   return (
     <div>
@@ -184,13 +186,7 @@ export function Clients() {
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={11} className="px-4 py-8 text-center text-gray-400">
-                  No se encontraron clientes.
-                </td>
-              </tr>
-            )}
+            {filtered.length === 0 && <EmptyState message="No se encontraron clientes." colSpan={11} />}
           </tbody>
         </table>
       </div>

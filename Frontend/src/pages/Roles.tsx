@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { rolesApi } from '../api/roles'
 import { permissionsApi } from '../api/permissions'
 import { Modal } from '../components/Modal'
+import { Spinner } from '../components/Spinner'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useToast } from '../hooks/useToast'
 import type { RoleResponse, RoleRequest, PermissionResponse } from '../types'
 
@@ -17,6 +19,8 @@ export function Roles() {
   const [editingRole, setEditingRole] = useState<RoleResponse | null>(null)
   const [form, setForm] = useState<RoleRequest>(emptyForm)
   const [submitting, setSubmitting] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<RoleResponse | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const [permModal, setPermModal] = useState(false)
   const [permRole, setPermRole] = useState<RoleResponse | null>(null)
@@ -62,14 +66,22 @@ export function Roles() {
     }
   }
 
-  async function handleDelete(role: RoleResponse) {
-    if (!window.confirm(`¿Eliminar el rol "${role.name}"? Esta acción no se puede deshacer.`)) return
+  function handleDelete(role: RoleResponse) {
+    setDeleteTarget(role)
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setDeleting(true)
     try {
-      await rolesApi.delete(role.id)
-      setRoles((prev) => prev.filter((r) => r.id !== role.id))
+      await rolesApi.delete(deleteTarget.id)
+      setRoles((prev) => prev.filter((r) => r.id !== deleteTarget.id))
       toast.showToast('Rol eliminado correctamente')
+      setDeleteTarget(null)
     } catch (err: any) {
       toast.showToast(err?.response?.data?.message || 'Error al eliminar el rol', 'error')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -97,7 +109,7 @@ export function Roles() {
     )
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
+  if (loading) return <Spinner />
 
   return (
     <div>
@@ -245,6 +257,15 @@ export function Roles() {
           </button>
         </div>
       </Modal>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Eliminar rol"
+        message={deleteTarget ? `¿Eliminar el rol "${deleteTarget.name}"? Esta acción no se puede deshacer.` : ''}
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }

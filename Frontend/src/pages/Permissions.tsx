@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { permissionsApi } from '../api/permissions'
 import { Modal } from '../components/Modal'
+import { Spinner } from '../components/Spinner'
+import { EmptyState } from '../components/EmptyState'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useToast } from '../hooks/useToast'
 import type { PermissionResponse, PermissionRequest } from '../types'
 
@@ -14,6 +17,8 @@ export function Permissions() {
   const [editing, setEditing] = useState<PermissionResponse | null>(null)
   const [form, setForm] = useState<PermissionRequest>(emptyForm)
   const [submitting, setSubmitting] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<PermissionResponse | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     permissionsApi.findAll()
@@ -55,18 +60,26 @@ export function Permissions() {
     }
   }
 
-  async function handleDelete(perm: PermissionResponse) {
-    if (!window.confirm(`¿Eliminar el permiso "${perm.name}"? Esta acción no se puede deshacer.`)) return
+  function handleDelete(perm: PermissionResponse) {
+    setDeleteTarget(perm)
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setDeleting(true)
     try {
-      await permissionsApi.delete(perm.id)
-      setPermissions((prev) => prev.filter((p) => p.id !== perm.id))
+      await permissionsApi.delete(deleteTarget.id)
+      setPermissions((prev) => prev.filter((p) => p.id !== deleteTarget.id))
       toast.showToast('Permiso eliminado correctamente')
+      setDeleteTarget(null)
     } catch (err: any) {
       toast.showToast(err?.response?.data?.message || 'Error al eliminar el permiso', 'error')
+    } finally {
+      setDeleting(false)
     }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
+  if (loading) return <Spinner />
 
   return (
     <div>
@@ -122,13 +135,7 @@ export function Permissions() {
                 </td>
               </tr>
             ))}
-            {permissions.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
-                  No se encontraron permisos.
-                </td>
-              </tr>
-            )}
+            {permissions.length === 0 && <EmptyState message="No se encontraron permisos." colSpan={6} />}
           </tbody>
         </table>
       </div>
@@ -180,6 +187,15 @@ export function Permissions() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Eliminar permiso"
+        message={deleteTarget ? `¿Eliminar el permiso "${deleteTarget.name}"? Esta acción no se puede deshacer.` : ''}
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }

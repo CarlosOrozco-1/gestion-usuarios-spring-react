@@ -65,12 +65,12 @@
 - [x] Permission list page (`/permissions`)
 - [x] Create/edit permission form
 
-## Phase 9: Error Handling & UX ⬜
+## Phase 9: Error Handling & UX ✅
 - [x] Toast/notification system (success, error, warning)
-- [ ] Global error boundary
-- [ ] Loading skeletons/spinners (solo texto "Loading...")
-- [ ] Empty state components (placeholder simple)
-- [ ] Confirm dialogs for destructive actions (usa `window.confirm`)
+- [x] Global error boundary
+- [x] Loading skeletons/spinners (componente `Spinner`)
+- [x] Empty state components (componente `EmptyState`)
+- [x] Confirm dialogs for destructive actions (componente `ConfirmDialog` reemplaza `window.confirm`)
 
 ## Phase 10: Polish ⬜
 - [ ] Pagination on list pages

@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { credentialsApi } from '../api/credentials'
 import { clientsApi } from '../api/clients'
 import { Modal } from '../components/Modal'
+import { Spinner } from '../components/Spinner'
+import { EmptyState } from '../components/EmptyState'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useToast } from '../hooks/useToast'
 import type { CredentialResponse, CredentialRequest, ClientResponse } from '../types'
 
@@ -24,6 +27,8 @@ export function Credentials() {
   const [editingCred, setEditingCred] = useState<CredentialResponse | null>(null)
   const [form, setForm] = useState<CredentialRequest>(emptyForm)
   const [submitting, setSubmitting] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<CredentialResponse | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     Promise.all([credentialsApi.findAll(), clientsApi.findAll()])
@@ -72,14 +77,22 @@ export function Credentials() {
     }
   }
 
-  async function handleDelete(cred: CredentialResponse) {
-    if (!window.confirm(`¿Eliminar la credencial de "${cred.systemName}"? Esta acción no se puede deshacer.`)) return
+  function handleDelete(cred: CredentialResponse) {
+    setDeleteTarget(cred)
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setDeleting(true)
     try {
-      await credentialsApi.delete(cred.id)
-      setCredentials((prev) => prev.filter((c) => c.id !== cred.id))
+      await credentialsApi.delete(deleteTarget.id)
+      setCredentials((prev) => prev.filter((c) => c.id !== deleteTarget.id))
       toast.showToast('Credencial eliminada correctamente')
+      setDeleteTarget(null)
     } catch (err: any) {
       toast.showToast(err?.response?.data?.message || 'Error al eliminar la credencial', 'error')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -90,7 +103,7 @@ export function Credentials() {
       c.clientName.toLowerCase().includes(search.toLowerCase()),
   )
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
+  if (loading) return <Spinner />
 
   return (
     <div>
@@ -160,13 +173,7 @@ export function Credentials() {
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
-                  No se encontraron credenciales.
-                </td>
-              </tr>
-            )}
+            {filtered.length === 0 && <EmptyState message="No se encontraron credenciales." colSpan={6} />}
           </tbody>
         </table>
       </div>
@@ -251,6 +258,15 @@ export function Credentials() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Eliminar credencial"
+        message={deleteTarget ? `¿Eliminar la credencial de "${deleteTarget.systemName}"? Esta acción no se puede deshacer.` : ''}
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }
