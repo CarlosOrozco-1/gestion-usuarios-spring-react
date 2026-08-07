@@ -51,10 +51,10 @@
 
 ## Phase 7: Testing ✅
 - [x] Unit tests: Service layer (JUnit 5 + Mockito) — 33 tests
-- [ ] Integration tests: Repository layer (@DataJpaTest)
-- [ ] Integration tests: Controller layer (@WebMvcTest + @MockBean)
-- [ ] Security tests: Authentication flow, token validation
-- [ ] Test coverage for error scenarios (404, 400, 409, 401)
+- [x] Integration tests: Repository layer (@DataJpaTest + H2) — 10 tests
+- [x] Integration tests: API layer (@SpringBootTest + @AutoConfigureMockMvc + H2) — 29 tests
+- [x] Security tests: Authentication flow, token validation (401/403)
+- [x] Test coverage for error scenarios (404, 400, 409, 401, 403) — total 72 tests
 
 ## Phase 8: Production Readiness ⬜
 - [ ] Environment variables for all secrets (DB, JWT secret)
