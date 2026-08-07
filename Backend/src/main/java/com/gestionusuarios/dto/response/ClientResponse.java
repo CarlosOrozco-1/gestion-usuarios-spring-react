@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,7 +15,10 @@ import java.time.LocalDateTime;
 public class ClientResponse {
     private Integer id;
     private String idNumber;
-    private String name;
+    private String nit;
+    private String nombreRazonSocial;
+    private String regimenFiscal;
+    private LocalDate fechaNacimiento;
     private String email;
     private String phone;
     private String address;

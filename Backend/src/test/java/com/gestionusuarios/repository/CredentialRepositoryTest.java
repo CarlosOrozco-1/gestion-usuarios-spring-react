@@ -27,9 +27,11 @@ class CredentialRepositoryTest {
     @BeforeEach
     void setUp() {
         clientA = clientRepository.save(Client.builder()
-                .idNumber("CA1").name("Acme Corp").email("acme@test.com").active(true).build());
+                .idNumber("CA1").nit("NITCA1").nombreRazonSocial("Acme Corp").regimenFiscal("GEN")
+                .email("acme@test.com").active(true).build());
         clientB = clientRepository.save(Client.builder()
-                .idNumber("CB1").name("Beta Ltd").email("beta@test.com").active(true).build());
+                .idNumber("CB1").nit("NITCB1").nombreRazonSocial("Beta Ltd").regimenFiscal("GEN")
+                .email("beta@test.com").active(true).build());
     }
 
     private Credential buildCredential(Client client, String system) {

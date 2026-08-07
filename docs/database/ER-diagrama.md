@@ -27,7 +27,10 @@ erDiagram
     CLIENT {
         int id PK
         string id_number UK
-        string name
+        string nit UK
+        string nombre_razon_social
+        string regimen_fiscal
+        date fecha_nacimiento
         string email UK
         string phone
         string address
@@ -73,7 +76,9 @@ erDiagram
 
 ## Notas
 - `SYSTEM_USER` representa los usuarios del sistema (quienes inician sesión).
-- `CLIENT` son los clientes gestionados por los usuarios del sistema.
+- `CLIENT` son los clientes gestionados por los usuarios del sistema. Su atributo
+  `nombre_razon_social` reemplaza al anterior `name` para alinearse con `DBClientes.sql`;
+  `nit`, `regimen_fiscal` y `fecha_nacimiento` también provienen de ese modelo.
 - `CREDENTIAL` guarda credenciales de acceso de un cliente a sistemas externos
   (con la contraseña cifrada).
 - El borrado de `SYSTEM_USER` y `CLIENT` es lógico (soft delete vía `active`).

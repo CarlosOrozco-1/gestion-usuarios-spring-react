@@ -24,12 +24,18 @@ class ClientApiTest extends BaseApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "idNumber", "C100",
-                                "name", "Cliente Demo",
+                                "nit", "100200300",
+                                "nombreRazonSocial", "Cliente Demo",
+                                "regimenFiscal", "GEN",
+                                "fechaNacimiento", "1990-05-15",
                                 "email", "demo@example.com",
                                 "phone", "555-1111",
                                 "address", "Av. Principal 123"))))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Cliente Demo"))
+                .andExpect(jsonPath("$.nombreRazonSocial").value("Cliente Demo"))
+                .andExpect(jsonPath("$.nit").value("100200300"))
+                .andExpect(jsonPath("$.regimenFiscal").value("GEN"))
+                .andExpect(jsonPath("$.fechaNacimiento").value("1990-05-15"))
                 .andExpect(jsonPath("$.email").value("demo@example.com"))
                 .andExpect(jsonPath("$.active").value(true));
     }
@@ -43,16 +49,36 @@ class ClientApiTest extends BaseApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "idNumber", "C102",
-                                "name", "Otro",
+                                "nit", "200300400",
+                                "nombreRazonSocial", "Otro",
+                                "regimenFiscal", "GEN",
                                 "email", "clientdup@example.com"))))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void create_WithDuplicateNit_ReturnsConflict() throws Exception {
+        createClient("C103", "NITDUP", "nitdup@example.com");
+
+        mockMvc.perform(post(CLIENTS_URL)
+                        .header("Authorization", "Bearer " + adminToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "idNumber", "C104",
+                                "nit", "NITDUP",
+                                "nombreRazonSocial", "Otro",
+                                "regimenFiscal", "GEN",
+                                "email", "other@example.com"))))
                 .andExpect(status().isConflict());
     }
 
     @Test
     void create_WithMissingEmail_ReturnsBadRequest() throws Exception {
         String body = objectMapper.createObjectNode()
-                .put("idNumber", "C103")
-                .put("name", "Sin Correo")
+                .put("idNumber", "C105")
+                .put("nit", "300400500")
+                .put("nombreRazonSocial", "Sin Correo")
+                .put("regimenFiscal", "GEN")
                 .toString();
 
         mockMvc.perform(post(CLIENTS_URL)
@@ -71,22 +97,28 @@ class ClientApiTest extends BaseApiTest {
 
     @Test
     void update_ReturnsUpdatedClient() throws Exception {
-        int id = createClient("C104", "clientupd@example.com");
+        int id = createClient("C106", "clientupd@example.com");
 
         mockMvc.perform(put(CLIENTS_URL + "/" + id)
                         .header("Authorization", "Bearer " + adminToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
-                                "idNumber", "C104",
-                                "name", "Cliente Actualizado",
+                                "idNumber", "C106",
+                                "nit", "400500600",
+                                "nombreRazonSocial", "Cliente Actualizado",
+                                "regimenFiscal", "PEQ",
+                                "fechaNacimiento", "1988-11-22",
                                 "email", "clientupd@example.com"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Cliente Actualizado"));
+                .andExpect(jsonPath("$.nombreRazonSocial").value("Cliente Actualizado"))
+                .andExpect(jsonPath("$.nit").value("400500600"))
+                .andExpect(jsonPath("$.regimenFiscal").value("PEQ"))
+                .andExpect(jsonPath("$.fechaNacimiento").value("1988-11-22"));
     }
 
     @Test
     void deactivate_ThenReactivate() throws Exception {
-        int id = createClient("C105", "clienttoggle@example.com");
+        int id = createClient("C107", "clienttoggle@example.com");
 
         mockMvc.perform(delete(CLIENTS_URL + "/" + id)
                         .header("Authorization", "Bearer " + adminToken()))

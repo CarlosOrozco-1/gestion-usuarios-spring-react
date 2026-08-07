@@ -4,7 +4,16 @@ import { Modal } from '../components/Modal'
 import { useToast } from '../hooks/useToast'
 import type { ClientResponse, ClientRequest } from '../types'
 
-const emptyForm: ClientRequest = { idNumber: '', name: '', email: '', phone: '', address: '' }
+const emptyForm: ClientRequest = {
+  idNumber: '',
+  nit: '',
+  nombreRazonSocial: '',
+  regimenFiscal: '',
+  fechaNacimiento: '',
+  email: '',
+  phone: '',
+  address: '',
+}
 
 export function Clients() {
   const toast = useToast()
@@ -31,20 +40,30 @@ export function Clients() {
 
   function openEdit(client: ClientResponse) {
     setEditingClient(client)
-    setForm({ idNumber: client.idNumber, name: client.name, email: client.email, phone: client.phone, address: client.address })
+    setForm({
+      idNumber: client.idNumber,
+      nit: client.nit,
+      nombreRazonSocial: client.nombreRazonSocial,
+      regimenFiscal: client.regimenFiscal,
+      fechaNacimiento: client.fechaNacimiento ? client.fechaNacimiento.slice(0, 10) : '',
+      email: client.email,
+      phone: client.phone,
+      address: client.address,
+    })
     setModalOpen(true)
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
+    const payload: ClientRequest = { ...form, fechaNacimiento: form.fechaNacimiento || null }
     try {
       if (editingClient) {
-        const updated = await clientsApi.update(editingClient.id, form)
+        const updated = await clientsApi.update(editingClient.id, payload)
         setClients((prev) => prev.map((c) => (c.id === editingClient.id ? updated : c)))
         toast.showToast('Cliente actualizado correctamente')
       } else {
-        const created = await clientsApi.create(form)
+        const created = await clientsApi.create(payload)
         setClients((prev) => [...prev, created])
         toast.showToast('Cliente creado correctamente')
       }
@@ -75,7 +94,8 @@ export function Clients() {
 
   const filtered = clients.filter(
     (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      (c.nombreRazonSocial?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
+      (c.nit?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
       c.email.toLowerCase().includes(search.toLowerCase()) ||
       c.idNumber.toLowerCase().includes(search.toLowerCase()),
   )
@@ -97,7 +117,7 @@ export function Clients() {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Buscar por nombre, correo o número de identificación..."
+          placeholder="Buscar por razón social, NIT, correo o número de identificación..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -110,7 +130,10 @@ export function Clients() {
             <tr>
               <th className="px-4 py-3">ID</th>
               <th className="px-4 py-3">N° Identificación</th>
-              <th className="px-4 py-3">Nombre</th>
+              <th className="px-4 py-3">NIT</th>
+              <th className="px-4 py-3">Razón social</th>
+              <th className="px-4 py-3">Régimen fiscal</th>
+              <th className="px-4 py-3">Fecha nacimiento</th>
               <th className="px-4 py-3">Correo</th>
               <th className="px-4 py-3">Teléfono</th>
               <th className="px-4 py-3">Dirección</th>
@@ -123,7 +146,10 @@ export function Clients() {
               <tr key={client.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-gray-500">{client.id}</td>
                 <td className="px-4 py-3 font-medium">{client.idNumber}</td>
-                <td className="px-4 py-3">{client.name}</td>
+                <td className="px-4 py-3">{client.nit || '-'}</td>
+                <td className="px-4 py-3">{client.nombreRazonSocial}</td>
+                <td className="px-4 py-3">{client.regimenFiscal || '-'}</td>
+                <td className="px-4 py-3">{client.fechaNacimiento ? client.fechaNacimiento.slice(0, 10) : '-'}</td>
                 <td className="px-4 py-3 text-gray-600">{client.email}</td>
                 <td className="px-4 py-3 text-gray-600">{client.phone || '-'}</td>
                 <td className="px-4 py-3 text-gray-600">{client.address || '-'}</td>
@@ -160,7 +186,7 @@ export function Clients() {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={11} className="px-4 py-8 text-center text-gray-400">
                   No se encontraron clientes.
                 </td>
               </tr>
@@ -181,11 +207,38 @@ export function Clients() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Nombre</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">NIT</label>
             <input
               required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              value={form.nit}
+              onChange={(e) => setForm({ ...form, nit: e.target.value })}
+              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Razón social</label>
+            <input
+              required
+              value={form.nombreRazonSocial}
+              onChange={(e) => setForm({ ...form, nombreRazonSocial: e.target.value })}
+              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Régimen fiscal</label>
+            <input
+              required
+              value={form.regimenFiscal}
+              onChange={(e) => setForm({ ...form, regimenFiscal: e.target.value })}
+              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Fecha de nacimiento</label>
+            <input
+              type="date"
+              value={form.fechaNacimiento ?? ''}
+              onChange={(e) => setForm({ ...form, fechaNacimiento: e.target.value })}
               className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>

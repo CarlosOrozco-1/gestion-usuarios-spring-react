@@ -184,7 +184,7 @@ export function Credentials() {
               <option value={0} disabled>Selecciona un cliente</option>
               {clients.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.name}
+                  {c.nombreRazonSocial}
                 </option>
               ))}
             </select>

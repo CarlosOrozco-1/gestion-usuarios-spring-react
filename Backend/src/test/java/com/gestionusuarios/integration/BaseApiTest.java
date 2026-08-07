@@ -72,12 +72,18 @@ public abstract class BaseApiTest {
     }
 
     protected int createClient(String idNumber, String email) throws Exception {
+        return createClient(idNumber, "NIT" + idNumber, email);
+    }
+
+    protected int createClient(String idNumber, String nit, String email) throws Exception {
         String response = mockMvc.perform(post("/api/clients")
                         .header("Authorization", "Bearer " + adminToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "idNumber", idNumber,
-                                "name", "Cliente " + idNumber,
+                                "nit", nit,
+                                "nombreRazonSocial", "Cliente " + idNumber,
+                                "regimenFiscal", "GEN",
                                 "email", email,
                                 "phone", "555-0000",
                                 "address", "Calle 123"))))

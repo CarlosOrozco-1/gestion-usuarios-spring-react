@@ -12,7 +12,7 @@ public final class CredentialMapper {
         return CredentialResponse.builder()
                 .id(credential.getId())
                 .clientId(credential.getClient().getId())
-                .clientName(credential.getClient().getName())
+                .clientName(credential.getClient().getNombreRazonSocial())
                 .systemName(credential.getSystemName())
                 .username(credential.getUsername())
                 .encryptedPassword(credential.getEncryptedPassword())

@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,8 +23,17 @@ public class Client {
     @Column(name = "id_number", unique = true, nullable = false, length = 50)
     private String idNumber;
 
-    @Column(name = "name", nullable = false, length = 200)
-    private String name;
+    @Column(name = "nit", unique = true, length = 50)
+    private String nit;
+
+    @Column(name = "nombre_razon_social", length = 200)
+    private String nombreRazonSocial;
+
+    @Column(name = "regimen_fiscal", length = 100)
+    private String regimenFiscal;
+
+    @Column(name = "fecha_nacimiento")
+    private LocalDate fechaNacimiento;
 
     @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;

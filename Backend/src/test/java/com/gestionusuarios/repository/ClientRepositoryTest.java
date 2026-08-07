@@ -16,7 +16,9 @@ class ClientRepositoryTest {
     private Client buildClient(String id, String email, boolean active) {
         return Client.builder()
                 .idNumber(id)
-                .name("Client " + id)
+                .nit("NIT" + id)
+                .nombreRazonSocial("Client " + id)
+                .regimenFiscal("GEN")
                 .email(email)
                 .phone("555-0000")
                 .address("Calle 1")
@@ -33,12 +35,14 @@ class ClientRepositoryTest {
     }
 
     @Test
-    void existsBy_ShouldDetectIdNumberAndEmail() {
+    void existsBy_ShouldDetectIdNumberNitAndEmail() {
         clientRepository.save(buildClient("C02", "exists@test.com", true));
 
         assertThat(clientRepository.existsByIdNumber("C02")).isTrue();
+        assertThat(clientRepository.existsByNit("NITC02")).isTrue();
         assertThat(clientRepository.existsByEmail("exists@test.com")).isTrue();
         assertThat(clientRepository.existsByIdNumber("ZZZ")).isFalse();
+        assertThat(clientRepository.existsByNit("ZZZ")).isFalse();
     }
 
     @Test

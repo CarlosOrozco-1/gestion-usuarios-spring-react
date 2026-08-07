@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,8 +21,18 @@ public class ClientRequest {
     private String idNumber;
 
     @NotBlank
+    @Size(max = 50)
+    private String nit;
+
+    @NotBlank
     @Size(max = 200)
-    private String name;
+    private String nombreRazonSocial;
+
+    @NotBlank
+    @Size(max = 100)
+    private String regimenFiscal;
+
+    private LocalDate fechaNacimiento;
 
     @NotBlank
     @Email

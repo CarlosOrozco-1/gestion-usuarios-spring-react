@@ -39,13 +39,19 @@ public class ClientService {
         if (clientRepository.existsByIdNumber(request.getIdNumber())) {
             throw new DuplicateResourceException("Client", "idNumber", request.getIdNumber());
         }
+        if (clientRepository.existsByNit(request.getNit())) {
+            throw new DuplicateResourceException("Client", "nit", request.getNit());
+        }
         if (clientRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Client", "email", request.getEmail());
         }
 
         Client client = Client.builder()
                 .idNumber(request.getIdNumber())
-                .name(request.getName())
+                .nit(request.getNit())
+                .nombreRazonSocial(request.getNombreRazonSocial())
+                .regimenFiscal(request.getRegimenFiscal())
+                .fechaNacimiento(request.getFechaNacimiento())
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .address(request.getAddress())
@@ -63,13 +69,20 @@ public class ClientService {
                 && clientRepository.existsByIdNumber(request.getIdNumber())) {
             throw new DuplicateResourceException("Client", "idNumber", request.getIdNumber());
         }
+        if (!client.getNit().equals(request.getNit())
+                && clientRepository.existsByNit(request.getNit())) {
+            throw new DuplicateResourceException("Client", "nit", request.getNit());
+        }
         if (!client.getEmail().equals(request.getEmail())
                 && clientRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Client", "email", request.getEmail());
         }
 
         client.setIdNumber(request.getIdNumber());
-        client.setName(request.getName());
+        client.setNit(request.getNit());
+        client.setNombreRazonSocial(request.getNombreRazonSocial());
+        client.setRegimenFiscal(request.getRegimenFiscal());
+        client.setFechaNacimiento(request.getFechaNacimiento());
         client.setEmail(request.getEmail());
         client.setPhone(request.getPhone());
         client.setAddress(request.getAddress());

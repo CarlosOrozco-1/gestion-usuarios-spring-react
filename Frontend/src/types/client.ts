@@ -1,7 +1,10 @@
 export interface ClientResponse {
   id: number
   idNumber: string
-  name: string
+  nit: string
+  nombreRazonSocial: string
+  regimenFiscal: string
+  fechaNacimiento: string | null
   email: string
   phone: string
   address: string
@@ -12,7 +15,10 @@ export interface ClientResponse {
 
 export interface ClientRequest {
   idNumber: string
-  name: string
+  nit: string
+  nombreRazonSocial: string
+  regimenFiscal: string
+  fechaNacimiento?: string | null
   email: string
   phone?: string
   address?: string
