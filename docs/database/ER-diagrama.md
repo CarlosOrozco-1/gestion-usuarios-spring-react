@@ -28,9 +28,9 @@ erDiagram
         int id PK
         string id_number UK
         string nit UK
-        string nombre_razon_social
-        string regimen_fiscal
-        date fecha_nacimiento
+        string business_name
+        string tax_regime
+        date birth_date
         string email UK
         string phone
         string address
@@ -76,9 +76,10 @@ erDiagram
 
 ## Notas
 - `SYSTEM_USER` representa los usuarios del sistema (quienes inician sesión).
-- `CLIENT` son los clientes gestionados por los usuarios del sistema. Su atributo
-  `nombre_razon_social` reemplaza al anterior `name` para alinearse con `DBClientes.sql`;
-  `nit`, `regimen_fiscal` y `fecha_nacimiento` también provienen de ese modelo.
+- `CLIENT` son los clientes gestionados por los usuarios del sistema. Las columnas se
+  normalizan en inglés (`business_name`, `tax_regime`, `birth_date`) aunque provienen de
+  `DBClientes.sql`, que conserva los nombres en español (`nombre_razon_social`,
+  `regimen_fiscal`, `fecha_nacimiento`) como referencia del requisito.
 - `CREDENTIAL` guarda credenciales de acceso de un cliente a sistemas externos
   (con la contraseña cifrada).
 - El borrado de `SYSTEM_USER` y `CLIENT` es lógico (soft delete vía `active`).

@@ -49,9 +49,9 @@ public class ClientService {
         Client client = Client.builder()
                 .idNumber(request.getIdNumber())
                 .nit(request.getNit())
-                .nombreRazonSocial(request.getNombreRazonSocial())
-                .regimenFiscal(request.getRegimenFiscal())
-                .fechaNacimiento(request.getFechaNacimiento())
+                .businessName(request.getBusinessName())
+                .taxRegime(request.getTaxRegime())
+                .birthDate(request.getBirthDate())
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .address(request.getAddress())
@@ -80,9 +80,9 @@ public class ClientService {
 
         client.setIdNumber(request.getIdNumber());
         client.setNit(request.getNit());
-        client.setNombreRazonSocial(request.getNombreRazonSocial());
-        client.setRegimenFiscal(request.getRegimenFiscal());
-        client.setFechaNacimiento(request.getFechaNacimiento());
+        client.setBusinessName(request.getBusinessName());
+        client.setTaxRegime(request.getTaxRegime());
+        client.setBirthDate(request.getBirthDate());
         client.setEmail(request.getEmail());
         client.setPhone(request.getPhone());
         client.setAddress(request.getAddress());

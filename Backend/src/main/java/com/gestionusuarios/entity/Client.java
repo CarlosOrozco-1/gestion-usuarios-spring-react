@@ -26,14 +26,14 @@ public class Client {
     @Column(name = "nit", unique = true, length = 50)
     private String nit;
 
-    @Column(name = "nombre_razon_social", length = 200)
-    private String nombreRazonSocial;
+    @Column(name = "business_name", length = 200)
+    private String businessName;
 
-    @Column(name = "regimen_fiscal", length = 100)
-    private String regimenFiscal;
+    @Column(name = "tax_regime", length = 100)
+    private String taxRegime;
 
-    @Column(name = "fecha_nacimiento")
-    private LocalDate fechaNacimiento;
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
     @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;

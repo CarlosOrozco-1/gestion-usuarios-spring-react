@@ -27,10 +27,10 @@ class CredentialRepositoryTest {
     @BeforeEach
     void setUp() {
         clientA = clientRepository.save(Client.builder()
-                .idNumber("CA1").nit("NITCA1").nombreRazonSocial("Acme Corp").regimenFiscal("GEN")
+                .idNumber("CA1").nit("NITCA1").businessName("Acme Corp").taxRegime("GEN")
                 .email("acme@test.com").active(true).build());
         clientB = clientRepository.save(Client.builder()
-                .idNumber("CB1").nit("NITCB1").nombreRazonSocial("Beta Ltd").regimenFiscal("GEN")
+                .idNumber("CB1").nit("NITCB1").businessName("Beta Ltd").taxRegime("GEN")
                 .email("beta@test.com").active(true).build());
     }
 

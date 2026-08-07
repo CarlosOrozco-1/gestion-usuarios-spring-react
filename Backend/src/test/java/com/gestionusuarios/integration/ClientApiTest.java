@@ -25,17 +25,17 @@ class ClientApiTest extends BaseApiTest {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "idNumber", "C100",
                                 "nit", "100200300",
-                                "nombreRazonSocial", "Cliente Demo",
-                                "regimenFiscal", "GEN",
-                                "fechaNacimiento", "1990-05-15",
+                                "businessName", "Cliente Demo",
+                                "taxRegime", "GEN",
+                                "birthDate", "1990-05-15",
                                 "email", "demo@example.com",
                                 "phone", "555-1111",
                                 "address", "Av. Principal 123"))))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.nombreRazonSocial").value("Cliente Demo"))
+                .andExpect(jsonPath("$.businessName").value("Cliente Demo"))
                 .andExpect(jsonPath("$.nit").value("100200300"))
-                .andExpect(jsonPath("$.regimenFiscal").value("GEN"))
-                .andExpect(jsonPath("$.fechaNacimiento").value("1990-05-15"))
+                .andExpect(jsonPath("$.taxRegime").value("GEN"))
+                .andExpect(jsonPath("$.birthDate").value("1990-05-15"))
                 .andExpect(jsonPath("$.email").value("demo@example.com"))
                 .andExpect(jsonPath("$.active").value(true));
     }
@@ -50,8 +50,8 @@ class ClientApiTest extends BaseApiTest {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "idNumber", "C102",
                                 "nit", "200300400",
-                                "nombreRazonSocial", "Otro",
-                                "regimenFiscal", "GEN",
+                                "businessName", "Otro",
+                                "taxRegime", "GEN",
                                 "email", "clientdup@example.com"))))
                 .andExpect(status().isConflict());
     }
@@ -66,8 +66,8 @@ class ClientApiTest extends BaseApiTest {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "idNumber", "C104",
                                 "nit", "NITDUP",
-                                "nombreRazonSocial", "Otro",
-                                "regimenFiscal", "GEN",
+                                "businessName", "Otro",
+                                "taxRegime", "GEN",
                                 "email", "other@example.com"))))
                 .andExpect(status().isConflict());
     }
@@ -77,8 +77,8 @@ class ClientApiTest extends BaseApiTest {
         String body = objectMapper.createObjectNode()
                 .put("idNumber", "C105")
                 .put("nit", "300400500")
-                .put("nombreRazonSocial", "Sin Correo")
-                .put("regimenFiscal", "GEN")
+                .put("businessName", "Sin Correo")
+                .put("taxRegime", "GEN")
                 .toString();
 
         mockMvc.perform(post(CLIENTS_URL)
@@ -105,15 +105,15 @@ class ClientApiTest extends BaseApiTest {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "idNumber", "C106",
                                 "nit", "400500600",
-                                "nombreRazonSocial", "Cliente Actualizado",
-                                "regimenFiscal", "PEQ",
-                                "fechaNacimiento", "1988-11-22",
+                                "businessName", "Cliente Actualizado",
+                                "taxRegime", "PEQ",
+                                "birthDate", "1988-11-22",
                                 "email", "clientupd@example.com"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nombreRazonSocial").value("Cliente Actualizado"))
+                .andExpect(jsonPath("$.businessName").value("Cliente Actualizado"))
                 .andExpect(jsonPath("$.nit").value("400500600"))
-                .andExpect(jsonPath("$.regimenFiscal").value("PEQ"))
-                .andExpect(jsonPath("$.fechaNacimiento").value("1988-11-22"));
+                .andExpect(jsonPath("$.taxRegime").value("PEQ"))
+                .andExpect(jsonPath("$.birthDate").value("1988-11-22"));
     }
 
     @Test

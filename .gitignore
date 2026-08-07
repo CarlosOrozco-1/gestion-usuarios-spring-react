@@ -16,6 +16,7 @@ build/
 # SQLite
 *.db
 *.db-journal
+*.bak
 
 # OS
 Thumbs.db

@@ -16,9 +16,9 @@ public class ClientResponse {
     private Integer id;
     private String idNumber;
     private String nit;
-    private String nombreRazonSocial;
-    private String regimenFiscal;
-    private LocalDate fechaNacimiento;
+    private String businessName;
+    private String taxRegime;
+    private LocalDate birthDate;
     private String email;
     private String phone;
     private String address;

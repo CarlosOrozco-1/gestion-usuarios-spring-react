@@ -26,13 +26,13 @@ public class ClientRequest {
 
     @NotBlank
     @Size(max = 200)
-    private String nombreRazonSocial;
+    private String businessName;
 
     @NotBlank
     @Size(max = 100)
-    private String regimenFiscal;
+    private String taxRegime;
 
-    private LocalDate fechaNacimiento;
+    private LocalDate birthDate;
 
     @NotBlank
     @Email

@@ -82,8 +82,8 @@ public abstract class BaseApiTest {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "idNumber", idNumber,
                                 "nit", nit,
-                                "nombreRazonSocial", "Cliente " + idNumber,
-                                "regimenFiscal", "GEN",
+                                "businessName", "Cliente " + idNumber,
+                                "taxRegime", "GEN",
                                 "email", email,
                                 "phone", "555-0000",
                                 "address", "Calle 123"))))

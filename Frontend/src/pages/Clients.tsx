@@ -7,9 +7,9 @@ import type { ClientResponse, ClientRequest } from '../types'
 const emptyForm: ClientRequest = {
   idNumber: '',
   nit: '',
-  nombreRazonSocial: '',
-  regimenFiscal: '',
-  fechaNacimiento: '',
+  businessName: '',
+  taxRegime: '',
+  birthDate: '',
   email: '',
   phone: '',
   address: '',
@@ -43,9 +43,9 @@ export function Clients() {
     setForm({
       idNumber: client.idNumber,
       nit: client.nit,
-      nombreRazonSocial: client.nombreRazonSocial,
-      regimenFiscal: client.regimenFiscal,
-      fechaNacimiento: client.fechaNacimiento ? client.fechaNacimiento.slice(0, 10) : '',
+      businessName: client.businessName,
+      taxRegime: client.taxRegime,
+      birthDate: client.birthDate ? client.birthDate.slice(0, 10) : '',
       email: client.email,
       phone: client.phone,
       address: client.address,
@@ -56,7 +56,7 @@ export function Clients() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
-    const payload: ClientRequest = { ...form, fechaNacimiento: form.fechaNacimiento || null }
+    const payload: ClientRequest = { ...form, birthDate: form.birthDate || null }
     try {
       if (editingClient) {
         const updated = await clientsApi.update(editingClient.id, payload)
@@ -94,7 +94,7 @@ export function Clients() {
 
   const filtered = clients.filter(
     (c) =>
-      (c.nombreRazonSocial?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
+      (c.businessName?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
       (c.nit?.toLowerCase() ?? '').includes(search.toLowerCase()) ||
       c.email.toLowerCase().includes(search.toLowerCase()) ||
       c.idNumber.toLowerCase().includes(search.toLowerCase()),
@@ -147,9 +147,9 @@ export function Clients() {
                 <td className="px-4 py-3 text-gray-500">{client.id}</td>
                 <td className="px-4 py-3 font-medium">{client.idNumber}</td>
                 <td className="px-4 py-3">{client.nit || '-'}</td>
-                <td className="px-4 py-3">{client.nombreRazonSocial}</td>
-                <td className="px-4 py-3">{client.regimenFiscal || '-'}</td>
-                <td className="px-4 py-3">{client.fechaNacimiento ? client.fechaNacimiento.slice(0, 10) : '-'}</td>
+                <td className="px-4 py-3">{client.businessName}</td>
+                <td className="px-4 py-3">{client.taxRegime || '-'}</td>
+                <td className="px-4 py-3">{client.birthDate ? client.birthDate.slice(0, 10) : '-'}</td>
                 <td className="px-4 py-3 text-gray-600">{client.email}</td>
                 <td className="px-4 py-3 text-gray-600">{client.phone || '-'}</td>
                 <td className="px-4 py-3 text-gray-600">{client.address || '-'}</td>
@@ -219,8 +219,8 @@ export function Clients() {
             <label className="mb-1 block text-sm font-medium text-gray-700">Razón social</label>
             <input
               required
-              value={form.nombreRazonSocial}
-              onChange={(e) => setForm({ ...form, nombreRazonSocial: e.target.value })}
+              value={form.businessName}
+              onChange={(e) => setForm({ ...form, businessName: e.target.value })}
               className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -228,8 +228,8 @@ export function Clients() {
             <label className="mb-1 block text-sm font-medium text-gray-700">Régimen fiscal</label>
             <input
               required
-              value={form.regimenFiscal}
-              onChange={(e) => setForm({ ...form, regimenFiscal: e.target.value })}
+              value={form.taxRegime}
+              onChange={(e) => setForm({ ...form, taxRegime: e.target.value })}
               className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -237,8 +237,8 @@ export function Clients() {
             <label className="mb-1 block text-sm font-medium text-gray-700">Fecha de nacimiento</label>
             <input
               type="date"
-              value={form.fechaNacimiento ?? ''}
-              onChange={(e) => setForm({ ...form, fechaNacimiento: e.target.value })}
+              value={form.birthDate ?? ''}
+              onChange={(e) => setForm({ ...form, birthDate: e.target.value })}
               className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
