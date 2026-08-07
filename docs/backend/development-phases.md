@@ -56,9 +56,9 @@
 - [x] Security tests: Authentication flow, token validation (401/403)
 - [x] Test coverage for error scenarios (404, 400, 409, 401, 403) — total 72 tests
 
-## Phase 8: Production Readiness ⬜
-- [ ] Environment variables for all secrets (DB, JWT secret)
-- [ ] Logging configuration (Logback)
-- [ ] Health endpoint / Actuator
+## Phase 8: Production Readiness ✅
+- [x] Environment variables for all secrets (DB, JWT secret, port, CORS)
+- [x] Logging configuration (Logback, rolling file + console)
+- [x] Health endpoint / Actuator (health, info)
 - [ ] Rate limiting (optional)
 - [ ] Audit logging (optional)
